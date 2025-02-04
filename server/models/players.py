@@ -7,7 +7,7 @@ from config import db, bcrypt
 import re
 
 class Player(db.Model, SerializerMixin):
-    _tablename_= "players"
+    __tablename__ = "players"  # Fixed typo
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String, nullable=False, unique=True)
@@ -16,7 +16,10 @@ class Player(db.Model, SerializerMixin):
     wildcard_id = db.Column(db.Integer, db.ForeignKey("wildcards.id"), nullable=False)
     yen = db.Column(db.Integer, default=20000, nullable=False)
     stock_limit = db.Column(db.Integer, default=6)  # Starting stock is 6
-    
+
+    # Ensure level never exceeds 99 at the DB level
+    __table_args__ = (CheckConstraint('level <= 99', name='check_max_level'),)
+
     # Relationship with Wildcard
     wildcard = db.relationship("Wildcard", backref="players")
 
@@ -60,10 +63,16 @@ class Player(db.Model, SerializerMixin):
         if db.session.query(Player).filter(Player.username == value).first():
             raise ValueError("Username is already taken.")
         return value
+
+    def __repr__(self):
+        return (f'<Player id: {self.id} Username: {self.username} '
+                f'Level: {self.level} Wildcard ID: {self.wildcard_id} '
+                f'Yen: {self.yen}>')
+
 def update_stock_limit(player):
-    # Increase stock limit by 1 every 10 levels, capped at 12
+    """Increase stock limit by 1 every 10 levels, capped at 12."""
     if player.level < 10:
-        player.stock_limit = 6  # Starting stock is 6
+        player.stock_limit = 6
     elif player.level < 20:
         player.stock_limit = 7
     elif player.level < 30:
@@ -76,9 +85,4 @@ def update_stock_limit(player):
         player.stock_limit = 11
     else:
         player.stock_limit = 12  # Cap at 12
-        db.session.commit()  # Commit changes to the database
-
-    def __repr__(self):
-        return (f'<Player id: {self.id} Username: {self.username} '
-                f'Level: {self.level} Wildcard ID: {self.wildcard_id} '
-                f'Yen: {self.yen}>')
+    db.session.commit()  # Commit changes to the database
