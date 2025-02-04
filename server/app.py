@@ -194,7 +194,7 @@ class SummonPersona(Resource):
             
             # Update stock limit based on the new level
             player.update_stock_limit()
-            
+
             return jsonify(selected_persona.to_dict()), 201
 
         except Exception as e:
@@ -373,6 +373,46 @@ class Fusion(Resource):
             db.session.rollback()
             return {'error': f'An error occurred: {str(e)}'}, 500
 
+class UpdatePlayerProfile(Resource):
+    def patch(self):
+        try:
+            json = request.get_json()
+            player_id = session.get('player_id')
+            if not player_id:
+                return {'error': 'Unauthorized, please log in first'}, 401
+
+            player = Player.query.get(player_id)
+            if not player:
+                return {'error': 'Player not found'}, 404
+
+            # Update only fields that are provided in the request
+            if 'password' in json:
+                player.password_hash = json['password']
+            if 'username' in json:
+                player.username = json['username']
+
+            db.session.commit()
+
+            return player.to_dict(), 200
+
+        except Exception as e:
+            db.session.rollback()
+            return {'error': f'An error occurred: {str(e)}'}, 500
+
+api.add_resource(ClearSession, '/api/clear', endpoint='clear')
+api.add_resource(Signup, '/api/signup', endpoint='signup')
+api.add_resource(CheckSession, '/api/check-session', endpoint='check_session')
+api.add_resource(Login, '/api/login', endpoint='login')
+api.add_resource(Logout, '/api/logout', endpoint='logout')
+api.add_resource(ChooseWildcardById, '/api/choose-wildcard/<int:wildcard_id>', endpoint='choose_wildcard_by_id')
+api.add_resource(PersonaByID, '/api/personas/<int:persona_id>', endpoint='persona_by_id')
+api.add_resource(SummonPersona, '/api/summon-persona', endpoint='summon_persona')
+api.add_resource(Wildcards, '/api/wildcards', endpoint='wildcards')
+api.add_resource(Compendiums, '/api/compendiums', endpoint='compendiums')
+api.add_resource(ReleasePersonaById, '/api/release-persona', endpoint='release_persona')
+api.add_resource(ArcanaById, '/api/arcanas/<int:arcana_id>', endpoint='arcana_by_id')
+api.add_resource(Fusion, '/api/fusion', endpoint='fusion')
+api.add_resource(UpdatePlayerProfile, '/api/update-player-profile', endpoint='update_player_profile')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
