@@ -19,6 +19,9 @@ class Compendium(db.Model, SerializerMixin):
     # Relationship to Persona
     persona = db.relationship('Persona', backref='compendiums')
 
+    # Serialization rules
+    serialize_rules = ('-player.compendiums', '-persona.compendiums')
+
     __table_args__ = (
         CheckConstraint('in_stock IN (0, 1)', name='check_in_stock_boolean'),
     )

@@ -11,5 +11,10 @@ class Arcana(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False, unique=True)
 
+     # Relationship with Personas
+    personas = db.relationship("Persona", backref="arcana")
+
+    serialize_rules = ('-personas.arcana',)
+
     def __repr__(self):
         return f'<Arcana id: {self.id} Name: {self.name}>'

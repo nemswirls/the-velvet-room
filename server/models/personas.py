@@ -23,6 +23,8 @@ class Persona(db.Model, SerializerMixin):
     __table_args__ = (
         CheckConstraint('level >= 1', name='level_greater_than_zero'),
     )
+     # Serialization rules
+    serialize_rules = ('-arcana.personas',)
     
     @hybrid_property
     def calculated_price(self):

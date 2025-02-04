@@ -18,6 +18,9 @@ class Stock(db.Model, SerializerMixin):
     # Relationship with Persona
     persona = db.relationship('Persona', backref='stocks')
 
+     # Serialization rules
+    serialize_rules = ('-player.stocks', '-persona.stocks')
+
     def __repr__(self):
         return f'<Stock id: {self.id} Player ID: {self.player_id} Persona ID: {self.persona_id}>'
         
