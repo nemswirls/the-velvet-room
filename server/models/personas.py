@@ -13,7 +13,7 @@ class Persona(db.Model, SerializerMixin):
     level = db.Column(db.Integer, nullable=False)
     in_pool = db.Column(db.Boolean, default=True)
     arcana_id = db.Column(db.Integer, db.ForeignKey('arcanas.id'), nullable=False)
-    price = db.Column(db.Integer, nullable= False)
+    # price = db.Column(db.Integer, nullable= False)
     special = db.Column(db.Boolean, default=False)
     image = db.Column(db.String)
     
@@ -32,13 +32,13 @@ class Persona(db.Model, SerializerMixin):
     @hybrid_property
     def calculated_price(self):
         # This is the property for the calculated price based on the persona's level
-        return self.level * 1000
+        return self.level * 100
 
     @calculated_price.expression
     def calculated_price(cls):
         # The SQL equivalent of the calculation, so that it can be used in queries
-        return cls.level * 1000
+        return cls.level * 100
     def __repr__(self):
         return (f'<Persona id: {self.id} Name: {self.name} (Level {self.level}) '
-                f'Price: {self.price} Yen Special: {self.special} '
+                f' Special: {self.special} '
                 f'Arcana id: {self.arcana_id} In pool: {self.in_pool} Image: {self.image}>')

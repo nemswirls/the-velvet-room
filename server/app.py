@@ -165,13 +165,14 @@ class SummonPersona(Resource):
             if player.yen < 200:
                 return {'error': 'Not enough yen.'}, 400
 
-            # Determine level range based on player level (e.g., ±5 levels)
-            min_level = max(1, player.level - 5)  # Ensure level is not less than 1
-            max_level = player.level + 5
-
-            # Query the personas table for personas within this level range
-            eligible_personas = Persona.query.filter(Persona.level >= min_level, Persona.level <= max_level).all()
-
+             # Special case: First summon while player is level 1
+            if player.level == 1:
+                eligible_personas = Persona.query.filter_by(level=1).all()
+            else:
+                # Regular summons, allow level range based on player level
+                min_level = max(1, player.level - 5)
+                max_level = player.level + 5
+                eligible_personas = Persona.query.filter(Persona.level >= min_level, Persona.level <= max_level).all()
             if not eligible_personas:
                 return {'error': 'No personas available for your level range.'}, 404
 
@@ -358,7 +359,7 @@ class Fusion(Resource):
             db.session.add(new_stock)
 
             # Level up the player and give yen based on level increase
-            level_up_amount = 3  # or 5 depending on your logic
+            level_up_amount = 5  
             player.level += level_up_amount
             player.yen += level_up_amount * 100  # 100 yen per level up
 
