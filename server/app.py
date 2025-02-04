@@ -10,6 +10,7 @@ from flask_restful import Resource
 from config import app, db, api
 # Add your model imports
 from models import Player, Arcana, Compendium, Persona, Stock, Wildcard, Special_Material
+from utilities import arcana_map 
 import random
 
 # Views go here!
@@ -337,7 +338,7 @@ class Fusion(Resource):
                 return {'error': 'You must have both personas in your stock to fuse them.'}, 400
 
             # Get fusion result from the arcana mapping
-            fusion_result = arcana_mapping.get((persona_1.arcana_id, persona_2.arcana_id))
+            fusion_result = arcana_map.get((persona_1.arcana_id, persona_2.arcana_id))
 
             if not fusion_result:
                 return {'error': 'These personas cannot be fused together.'}, 400
