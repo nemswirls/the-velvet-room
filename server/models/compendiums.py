@@ -1,0 +1,38 @@
+from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy_serializer import SerializerMixin
+from sqlalchemy import CheckConstraint
+from sqlalchemy.orm import validates
+from config import db
+
+
+class Compendium(db.Model, SerializerMixin):
+    __tablename__ = "compendiums"
+
+    id = db.Column(db.Integer, primary_key=True)
+    player_id = db.Column(db.Integer, db.ForeignKey('players.id'), nullable=False)
+    persona_id = db.Column(db.Integer, db.ForeignKey('personas.id'), nullable=False)
+    in_stock = db.Column(db.Boolean, default=True)
+
+    # Relationship to Player
+    player = db.relationship('Player', backref='compendiums')
+
+    # Relationship to Persona
+    persona = db.relationship('Persona', backref='compendiums')
+
+    __table_args__ = (
+        CheckConstraint('in_stock IN (0, 1)', name='check_in_stock_boolean'),
+    )
+
+    @hybrid_property
+    def purchase_price(self):
+        """
+        This calculates the price for purchasing a persona from the compendium.
+        Can use the 'calculated_price' from the Persona model or set a static price.
+        """
+        return self.persona.calculated_price
+    
+    
+    def __repr__(self):
+        return (f'<Compendium id: {self.id} Player id: {self.player_id} '
+                f'Persona id: {self.persona_id} In stock: {self.in_stock} '
+                f'Price: {self.purchase_price}>')
