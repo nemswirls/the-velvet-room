@@ -24,7 +24,7 @@ arcanas = [
 ]
 
 wildcards = [
-    {"id": 1, "name": "Makoto Yuki", "image": "dragon_knight.png", "initial_persona_id": 1},
-    {"id": 2, "name": "Yu Narukami", "image": "dawn_warrior.png", "initial_persona_id": 2},
-    {"id": 3, "name": "Ren Amamiya", "image": "heavens_envoy.png", "initial_persona_id": 3},
+    {"id": 1, "name": "Makoto Yuki", "image": "makoto_yuki_wildcard.png", "initial_persona_id": 1},
+    {"id": 2, "name": "Yu Narukami", "image": "yu_narukami_wildcard.png", "initial_persona_id": 2},
+    {"id": 3, "name": "Ren Amamiya", "image": "ren_amamiya_wildcard.png", "initial_persona_id": 3},
 ]
