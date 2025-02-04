@@ -20,6 +20,9 @@ class Persona(db.Model, SerializerMixin):
     # Relationship to Arcana
     arcana = db.relationship('Arcana', backref='personas')
 
+    # Relationship with the compendium, if the persona is available there
+    compendium_entries = db.relationship('Compendium', backref='persona', lazy=True)
+
     __table_args__ = (
         CheckConstraint('level >= 1', name='level_greater_than_zero'),
     )

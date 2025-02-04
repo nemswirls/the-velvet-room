@@ -14,10 +14,14 @@ class Player(db.Model, SerializerMixin):
     _password_hash = db.Column(db.String, nullable=False)
     level = db.Column(db.Integer, default=1, nullable=False)
     wildcard_id = db.Column(db.Integer, db.ForeignKey("wildcards.id"), nullable=False)
-    yen = db.Column(db.Integer, default=10000, nullable=False)
-
+    yen = db.Column(db.Integer, default=20000, nullable=False)
+    stock_limit = db.Column(db.Integer, default=6)  # Starting stock is 6
+    
     # Relationship with Wildcard
     wildcard = db.relationship("Wildcard", backref="players")
+
+    # Add relationship to Stock model
+    stock = db.relationship('Stock', backref='player', lazy='dynamic')
 
     # Serialization rules to include Wildcard and exclude password fields
     serialize_rules = ('-password_hash', '-_password_hash', 'wildcard')
@@ -56,9 +60,23 @@ class Player(db.Model, SerializerMixin):
         if db.session.query(Player).filter(Player.username == value).first():
             raise ValueError("Username is already taken.")
         return value
-
-
-
+def update_stock_limit(player):
+    # Increase stock limit by 1 every 10 levels, capped at 12
+    if player.level < 10:
+        player.stock_limit = 6  # Starting stock is 6
+    elif player.level < 20:
+        player.stock_limit = 7
+    elif player.level < 30:
+        player.stock_limit = 8
+    elif player.level < 40:
+        player.stock_limit = 9
+    elif player.level < 50:
+        player.stock_limit = 10
+    elif player.level < 60:
+        player.stock_limit = 11
+    else:
+        player.stock_limit = 12  # Cap at 12
+        db.session.commit()  # Commit changes to the database
 
     def __repr__(self):
         return (f'<Player id: {self.id} Username: {self.username} '
