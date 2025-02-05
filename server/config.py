@@ -8,12 +8,14 @@ from flask_restful import Api
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
-
+from dotenv import load_dotenv
 import os
 # Local imports
-
+load_dotenv()
 # Instantiate app, set attributes
 app = Flask(__name__)
+
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///velvetRoom.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.json.compact = False

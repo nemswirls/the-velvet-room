@@ -21,7 +21,8 @@ def index():
 
 @app.before_request
 def check_if_logged_in():
-    if not session.get('player_id'):
+    openaccess= ["signup", "login", "check-session"]
+    if not session.get('player_id') and not request.endpoint in openaccess:
         return {'error': 'Unauthorized, please log in first'}, 401
 
 class ClearSession(Resource):
@@ -51,9 +52,10 @@ class Signup(Resource):
 
             db.session.add(player)
             db.session.commit()
-
+            session['player_id'] = player.id  # Store player ID in the session
             # After creating the player, return a message saying they can now choose a wildcard
-            return {'message': 'Player created successfully, now choose your wildcard.'}, 201
+            # return {'message': 'Player created successfully, now choose your wildcard.'}, 201
+            return make_response(player.to_dict(), 201)
         except Exception as e:
             db.session.rollback()
             return {'error': f'An error occurred: {str(e)}'}, 500

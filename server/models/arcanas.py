@@ -12,7 +12,7 @@ class Arcana(db.Model, SerializerMixin):
     name = db.Column(db.String, nullable=False, unique=True)
 
      # Relationship with Personas
-    personas = db.relationship("Persona", backref="arcana")
+    personas = db.relationship("Persona", back_populates="arcana")
 
     serialize_rules = ('-personas.arcana',)
 

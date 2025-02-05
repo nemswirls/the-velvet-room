@@ -14,7 +14,7 @@ class Compendium(db.Model, SerializerMixin):
     in_stock = db.Column(db.Boolean, default=True)
 
     # Relationship to Player
-    player = db.relationship('Player', backref='compendiums')
+    player = db.relationship('Player', back_populates='compendiums')
 
     # Relationship to Persona
     persona = db.relationship('Persona', back_populates='compendium_entries')

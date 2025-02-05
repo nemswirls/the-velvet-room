@@ -11,20 +11,23 @@ class Wildcard(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False, unique=True)
     image = db.Column(db.String)
-    initial_persona_id = db.Column(db.Integer, db.ForeignKey("personas.id"), nullable=False)
+    persona_id = db.Column(db.Integer, db.ForeignKey("personas.id"), nullable=False)
     
     # Relationship to the initial persona
-    initial_persona = db.relationship("Persona", backref="wildcards", uselist=False)
+    initial_persona = db.relationship("Persona", back_populates="wildcard", uselist=False)
+
+    # Relationship to the players
+    players= db.relationship("Player", back_populates="wildcard")
 
    # Define the relationship with special_fusions
-    special_fusions = db.relationship(
-        "Persona",
-        secondary="special_materials",
-        primaryjoin="Wildcard.id == special_materials.c.wildcard_id",
-        secondaryjoin="Persona.id == special_materials.c.persona_id",
-        foreign_keys="[special_materials.c.wildcard_id, special_materials.c.persona_id]",
-        backref="wildcards",
-    )
+    # special_fusions = db.relationship(
+    #     "Persona",
+    #     secondary="special_materials",
+    #     primaryjoin="Wildcard.id == special_materials.c.wildcard_id",
+    #     secondaryjoin="Persona.id == special_materials.c.persona_id",
+    #     foreign_keys="[special_materials.c.wildcard_id, special_materials.c.persona_id]",
+    #     backref="wildcards",
+    # )
 
     serialize_rules = ('-players.wildcard', '-special_materials.wildcard')
     def __repr__(self):

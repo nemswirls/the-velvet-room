@@ -1,8 +1,8 @@
-"""Initial migration
+"""create tables
 
-Revision ID: 936820381e57
+Revision ID: 92aeb183467a
 Revises: 
-Create Date: 2025-02-04 23:27:18.423125
+Create Date: 2025-02-05 12:31:06.727083
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '936820381e57'
+revision = '92aeb183467a'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -41,8 +41,8 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('image', sa.String(), nullable=True),
-    sa.Column('initial_persona_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['initial_persona_id'], ['personas.id'], name=op.f('fk_wildcards_initial_persona_id_personas')),
+    sa.Column('persona_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['persona_id'], ['personas.id'], name=op.f('fk_wildcards_persona_id_personas')),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('name')
     )

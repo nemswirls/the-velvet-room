@@ -10,10 +10,10 @@ with app.app_context():
     # db.session.query(Special_Material).delete()
     # db.session.query(Compendium).delete()
     # db.session.query(Stock).delete()
-    db.session.query(Persona).delete()
-    db.session.query(Wildcard).delete()
+    Wildcard.query.delete()
+    Persona.query.delete()
     # db.session.query(Player).delete()
-    db.session.query(Arcana).delete()
+    Arcana.query.delete()
 
     print("Creating arcanas...")
     arcana_dict={arcana["name"]: Arcana(name=arcana["name"]) for arcana in arcanas}
@@ -33,15 +33,17 @@ with app.app_context():
         )
         for persona in personas
     ])
+    db.session.commit()
     print("Creating wildcards...")
     db.session.add_all([
         Wildcard(
             name=wildcard["name"],
             image=wildcard["image"],
-            initial_persona_id=Persona.query.filter_by(name=wildcard["initial_persona_id"]).id
+            persona_id=Persona.query.filter_by(name=wildcard["initial_persona_id"]).first().id
         )
         for wildcard in wildcards
     ])
+    db.session.commit()
 #     print("Creating stock...")
 #     db.session.add_all([
 #     Stock(
@@ -88,5 +90,4 @@ with app.app_context():
 # print("Player creation complete!")
 
 
-db.session.commit()
-print("Seeding complete!")
+    print("Seeding complete!")

@@ -13,7 +13,7 @@ class Player(db.Model, SerializerMixin):
     username = db.Column(db.String, nullable=False, unique=True)
     _password_hash = db.Column(db.String, nullable=False)
     level = db.Column(db.Integer, default=1, nullable=False)
-    wildcard_id = db.Column(db.Integer, db.ForeignKey("wildcards.id"), nullable=False)
+    wildcard_id = db.Column(db.Integer, db.ForeignKey("wildcards.id"), nullable=True)
     yen = db.Column(db.Integer, default=20000, nullable=False)
     stock_limit = db.Column(db.Integer, default=6)  # Starting stock is 6
 
@@ -21,17 +21,19 @@ class Player(db.Model, SerializerMixin):
     __table_args__ = (CheckConstraint('level <= 99', name='check_max_level'),)
 
     # Relationship with Wildcard
-    wildcard = db.relationship("Wildcard", backref="players")
+    wildcard = db.relationship("Wildcard", back_populates="players")
 
     # Add relationship to Stock model
     stocks = db.relationship('Stock', back_populates='player')
-
+    # Add relationship to Compendium model
+    compendiums = db.relationship('Compendium', back_populates='player')
     # Serialization rules to include Wildcard and exclude password fields
-    serialize_rules = ('-_password_hash', 'wildcard')
+    serialize_rules = ('-_password_hash','-password_hash', 'wildcard')
 
     @hybrid_property
     def password_hash(self):
-        raise Exception('Password hashes may not be viewed.')
+        return "hashed password"
+        # raise Exception('Password hashes may not be viewed.')
     
     @password_hash.setter
     def password_hash(self, password):
