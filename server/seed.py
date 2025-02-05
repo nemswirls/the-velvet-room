@@ -8,11 +8,11 @@ with app.app_context():
 
     # Clear all tables in order
     # db.session.query(Special_Material).delete()
-    # db.session.query(Compendium).delete()
-    # db.session.query(Stock).delete()
+    Compendium.query.delete()
+    Stock.query.delete()
     Wildcard.query.delete()
     Persona.query.delete()
-    # db.session.query(Player).delete()
+    Player.query.delete()
     Arcana.query.delete()
 
     print("Creating arcanas...")

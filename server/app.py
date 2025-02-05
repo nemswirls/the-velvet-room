@@ -91,11 +91,9 @@ class Logout(Resource):
         session['player_id'] = None
         return {}, 204
 
-class ChooseWildcardById(Resource):
-    def post(self):
+class ChooseWildcard(Resource):
+    def post(self, wildcard_id):
         try:
-            json = request.get_json()
-
             # Get the player_id from the session
             player_id = session.get('player_id')
             if not player_id:
@@ -106,39 +104,35 @@ class ChooseWildcardById(Resource):
             if not player:
                 return {'error': 'Player not found'}, 404
 
-            # Get the wildcard_id from the request
-            wildcard_id = json.get('wildcard_id')
-            if not wildcard_id:
-                return {'error': 'Wildcard ID is required'}, 400
-
             # Fetch the wildcard data from the database
             wildcard = Wildcard.query.filter(Wildcard.id == wildcard_id).first()
             if not wildcard:
                 return {'error': 'Invalid wildcard ID'}, 400
 
-            # Optionally, check if the player has already chosen a wildcard
+            # Check if the player already chose a wildcard
             if player.wildcard:
                 return {'error': 'You have already chosen a wildcard'}, 400
 
             # Assign the chosen wildcard to the player
             player.wildcard = wildcard
 
-            # Assign the initial persona to the player's stock based on their wildcard
-            initial_persona = Persona.query.filter(Persona.wildcard_id == wildcard.id).first()  # Adjust the field if necessary
+            # Assign the initial persona based on the wildcard
+            if wildcard.name == "Makoto Yuki":
+                initial_persona = Persona.query.filter_by(name="Orpheus").first()  
+            elif wildcard.name == "Yu Narukami":
+                initial_persona = Persona.query.filter_by(name="Izanagi").first()  
+            elif wildcard.name == "Ren Amamiya":
+                initial_persona = Persona.query.filter_by(name="Arsène").first()  
+
             if initial_persona:
-                # Add the initial persona to the player's stock (assuming the player has a stock table)
                 new_stock = Stock(player_id=player.id, persona_id=initial_persona.id)
                 db.session.add(new_stock)
 
-            # Commit all changes to the database
             db.session.commit()
-
-            # Return the updated player profile with the chosen wildcard and initial persona
             return {'message': 'Wildcard chosen successfully', 'player': player.to_dict()}, 200
         except Exception as e:
             db.session.rollback()
             return {'error': f'An error occurred: {str(e)}'}, 500
-
 class PersonaByID(Resource):   
     def get(self, persona_id):
         # Retrieve a specific persona by ID
@@ -148,7 +142,7 @@ class PersonaByID(Resource):
         return persona.to_dict(), 200
     
 class SummonPersona(Resource):
-    def post(self):
+    def get(self):
         try:
             # Get player_id from session
             player_id = session.get('player_id')
@@ -161,7 +155,7 @@ class SummonPersona(Resource):
                 return {'error': 'Player not found'}, 404
 
             # Check if player's stock is full
-            if len(player.stock) >= player.stock_limit:
+            if len(player.stocks) >= player.stock_limit:
                 return {'error': 'You have reached your stock limit.'}, 400
 
             # Check if player has enough yen (assuming 200 yen per summon)
@@ -173,15 +167,15 @@ class SummonPersona(Resource):
                 eligible_personas = Persona.query.filter_by(level=1).all()
             else:
                 # Regular summons, allow level range based on player level
-                min_level = max(1, player.level - 5)
-                max_level = player.level + 5
+                min_level = max(1, player.level - 3)
+                max_level = player.level + 3
                 eligible_personas = Persona.query.filter(Persona.level >= min_level, Persona.level <= max_level).all()
             if not eligible_personas:
                 return {'error': 'No personas available for your level range.'}, 404
 
             # Randomly select a persona from eligible personas
             selected_persona = random.choice(eligible_personas)
-
+            print(type(selected_persona))
             # Deduct yen from player
             player.yen -= 200
             db.session.commit()
@@ -198,8 +192,8 @@ class SummonPersona(Resource):
             
             # Update stock limit based on the new level
             player.update_stock_limit()
-
-            return jsonify(selected_persona.to_dict()), 201
+            db.session.commit()
+            return make_response(selected_persona.to_dict(), 201)
 
         except Exception as e:
             db.session.rollback()  # Rollback on error
@@ -360,12 +354,12 @@ class Fusion(Resource):
             # Add the resulting persona to stock
             new_stock = Stock(player_id=player_id, persona_id=resulting_persona.id)
             db.session.add(new_stock)
-
+            db.session.commit()
             # Level up the player and give yen based on level increase
             level_up_amount = 5  
             player.level += level_up_amount
             player.yen += level_up_amount * 100  # 100 yen per level up
-
+            db.session.commit()
             # Update stock limit based on the new level
             player.update_stock_limit()
 
@@ -408,7 +402,7 @@ api.add_resource(Signup, '/api/signup', endpoint='signup')
 api.add_resource(CheckSession, '/api/check-session', endpoint='check_session')
 api.add_resource(Login, '/api/login', endpoint='login')
 api.add_resource(Logout, '/api/logout', endpoint='logout')
-api.add_resource(ChooseWildcardById, '/api/choose-wildcard/<int:wildcard_id>', endpoint='choose_wildcard_by_id')
+api.add_resource(ChooseWildcard, '/api/choose-wildcard/<int:wildcard_id>', endpoint='choose_wildcard')
 api.add_resource(PersonaByID, '/api/personas/<int:persona_id>', endpoint='persona_by_id')
 api.add_resource(SummonPersona, '/api/summon-persona', endpoint='summon_persona')
 api.add_resource(Wildcards, '/api/wildcards', endpoint='wildcards')

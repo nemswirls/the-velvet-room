@@ -16,7 +16,7 @@ class Stock(db.Model, SerializerMixin):
     player = db.relationship('Player', back_populates='stocks')
 
     # Relationship with Persona
-    persona = db.relationship('Persona', backref='stocks')
+    persona = db.relationship('Persona', back_populates='stocks')
 
     # Serialization rules
     serialize_rules = ('-player.stocks', '-persona.stocks')

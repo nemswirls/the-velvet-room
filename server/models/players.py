@@ -24,11 +24,11 @@ class Player(db.Model, SerializerMixin):
     wildcard = db.relationship("Wildcard", back_populates="players")
 
     # Add relationship to Stock model
-    stocks = db.relationship('Stock', back_populates='player')
+    stocks = db.relationship('Stock', back_populates='player', cascade="all, delete-orphan")
     # Add relationship to Compendium model
-    compendiums = db.relationship('Compendium', back_populates='player')
+    compendiums = db.relationship('Compendium', back_populates='player', cascade="all, delete-orphan")
     # Serialization rules to include Wildcard and exclude password fields
-    serialize_rules = ('-_password_hash','-password_hash', 'wildcard')
+    serialize_rules = ('-_password_hash','-password_hash', '-wildcard_id',"wildcard")
 
     @hybrid_property
     def password_hash(self):
@@ -71,20 +71,20 @@ class Player(db.Model, SerializerMixin):
                 f'Level: {self.level} Wildcard ID: {self.wildcard_id} '
                 f'Yen: {self.yen}>')
 
-def update_stock_limit(player):
-    """Increase stock limit by 1 every 10 levels, capped at 12."""
-    if player.level < 10:
-        player.stock_limit = 6
-    elif player.level < 20:
-        player.stock_limit = 7
-    elif player.level < 30:
-        player.stock_limit = 8
-    elif player.level < 40:
-        player.stock_limit = 9
-    elif player.level < 50:
-        player.stock_limit = 10
-    elif player.level < 60:
-        player.stock_limit = 11
-    else:
-        player.stock_limit = 12  # Cap at 12
-    db.session.commit()  # Commit changes to the database
+    def update_stock_limit(self):
+        """Increase stock limit by 1 every 10 levels, capped at 12."""
+        if self.level < 10:
+            self.stock_limit = 6
+        elif self.level < 20:
+            self.stock_limit = 7
+        elif self.level < 30:
+            self.stock_limit = 8
+        elif self.level < 40:
+            self.stock_limit = 9
+        elif self.level < 50:
+            self.stock_limit = 10
+        elif self.level < 60:
+            self.stock_limit = 11
+        else:
+            self.stock_limit = 12  # Cap at 12
+        db.session.commit()  # Commit changes to the database
