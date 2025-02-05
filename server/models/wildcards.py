@@ -16,8 +16,15 @@ class Wildcard(db.Model, SerializerMixin):
     # Relationship to the initial persona
     initial_persona = db.relationship("Persona", backref="wildcards", uselist=False)
 
-    # Relationship to special fusions (many-to-many)
-    special_fusions = db.relationship("Persona", secondary="special_materials", backref="wildcards_with_special_fusions")
+   # Define the relationship with special_fusions
+    special_fusions = db.relationship(
+        "Persona",
+        secondary="special_materials",
+        primaryjoin="Wildcard.id == special_materials.c.wildcard_id",
+        secondaryjoin="Persona.id == special_materials.c.persona_id",
+        foreign_keys="[special_materials.c.wildcard_id, special_materials.c.persona_id]",
+        backref="wildcards",
+    )
 
     serialize_rules = ('-players.wildcard', '-special_materials.wildcard')
     def __repr__(self):

@@ -17,7 +17,7 @@ class Compendium(db.Model, SerializerMixin):
     player = db.relationship('Player', backref='compendiums')
 
     # Relationship to Persona
-    persona = db.relationship('Persona', backref='compendiums')
+    persona = db.relationship('Persona', back_populates='compendium_entries')
 
     # Serialization rules
     serialize_rules = ('-player.compendiums', '-persona.compendiums')

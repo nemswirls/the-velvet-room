@@ -17,11 +17,20 @@ class Persona(db.Model, SerializerMixin):
     special = db.Column(db.Boolean, default=False)
     image = db.Column(db.String)
     
-    # Relationship to Arcana
-    arcana = db.relationship('Arcana', backref='personas')
 
-    # Relationship with the compendium, if the persona is available there
-    compendium_entries = db.relationship('Compendium', backref='persona', lazy=True)
+    
+    compendium_entries = db.relationship("Compendium", back_populates="persona")
+    # Relationships for special fusions
+    special_fusion_materials = db.relationship(
+        'Special_Material',
+        foreign_keys='Special_Material.special_fusion_id',
+        back_populates='special_fusion'
+    )
+    material_for_special_fusions = db.relationship(
+        'Special_Material',
+        foreign_keys='Special_Material.material_id',
+        back_populates='material'
+    )
 
     __table_args__ = (
         CheckConstraint('level >= 1', name='level_greater_than_zero'),

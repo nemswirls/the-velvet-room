@@ -7,7 +7,7 @@ from config import db, bcrypt
 import re
 
 class Player(db.Model, SerializerMixin):
-    __tablename__ = "players"  # Fixed typo
+    __tablename__ = "players"  
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String, nullable=False, unique=True)
@@ -24,10 +24,10 @@ class Player(db.Model, SerializerMixin):
     wildcard = db.relationship("Wildcard", backref="players")
 
     # Add relationship to Stock model
-    stock = db.relationship('Stock', backref='player', lazy='dynamic')
+    stocks = db.relationship('Stock', back_populates='player')
 
     # Serialization rules to include Wildcard and exclude password fields
-    serialize_rules = ('-password_hash', '-_password_hash', 'wildcard')
+    serialize_rules = ('-_password_hash', 'wildcard')
 
     @hybrid_property
     def password_hash(self):

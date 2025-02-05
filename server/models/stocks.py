@@ -9,16 +9,16 @@ class Stock(db.Model, SerializerMixin):
     __tablename__ = "stocks"
 
     id = db.Column(db.Integer, primary_key=True)
-    player_id = db.Column(db.Integer, db.ForeignKey("players_id"), nullable=False)
+    player_id = db.Column(db.Integer, db.ForeignKey("players.id"), nullable=False)  # Corrected reference
     persona_id = db.Column(db.Integer, db.ForeignKey("personas.id"), nullable=False)
 
     # Relationship with Player
-    player = db.relationship('Player', backref='stocks')
+    player = db.relationship('Player', back_populates='stocks')
 
     # Relationship with Persona
     persona = db.relationship('Persona', backref='stocks')
 
-     # Serialization rules
+    # Serialization rules
     serialize_rules = ('-player.stocks', '-persona.stocks')
 
     def __repr__(self):
