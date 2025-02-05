@@ -333,7 +333,7 @@ arcana_map = {
        "moon": "hanged man",
        "sun": "justice",
        "judgement": "devil",
-       "aeon": ""
+       "aeon": "moon"
     },
     "temperance":{
        "fool": "chariot",
@@ -517,7 +517,7 @@ arcana_map = {
        "fortune": "moon",
        "strength": "fool",
        "hanged man": "death",
-       "death": "",
+       "death": "moon",
        "temperance": "justice",
        "devil": "star",
        "tower": "sun",
