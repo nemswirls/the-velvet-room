@@ -29,8 +29,8 @@ class Wildcard(db.Model, SerializerMixin):
     #     backref="wildcards",
     # )
 
-    serialize_rules = ('-players.wildcard', '-special_materials.wildcard')
+    serialize_rules = ('-players', '-special_materials.wildcard')
     def __repr__(self):
         
-        return (f'<Wildcard id: {self.id} Name: {self.name} '
-                f'Image: {self.image} Initial Persona ID: {self.initial_persona}>')
+       return (f'<Wildcard id: {self.id} Name: {self.name} '
+        f'Image: {self.image} Initial Persona: {self.initial_persona}>')

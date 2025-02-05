@@ -50,5 +50,5 @@ class Persona(db.Model, SerializerMixin):
         return cls.level * 100
     def __repr__(self):
         return (f'<Persona id: {self.id} Name: {self.name} (Level {self.level}) '
-                f' Special: {self.special} '
-                f'Arcana id: {self.arcana_id} In pool: {self.in_pool} Image: {self.image}>')
+            f'Special: {self.special} Arcana ID: {self.arcana_id} '
+            f'In Pool: {self.in_pool} Image: {self.image}>')

@@ -129,6 +129,17 @@ class ChooseWildcard(Resource):
                 db.session.add(new_stock)
 
             db.session.commit()
+            # # Check if persona already exists in the compendium
+            # existing_entry = Compendium.query.filter_by(persona_id=initial_persona.id).first()
+            # print(f"Compendium entry for persona {initial_persona.id} exists: {existing_entry}")
+
+            # if not existing_entry:
+            #     # Persona not in the compendium, add it
+            #     new_compendium_entry = Compendium(player_id=player.id, persona_id=initial_persona.id, in_stock=True)
+            #     db.session.add(new_compendium_entry)
+            #     print(f"Added new entry to Compendium for Persona ID: {initial_persona.id}")
+
+            # db.session.commit()
             return {'message': 'Wildcard chosen successfully', 'player': player.to_dict()}, 200
         except Exception as e:
             db.session.rollback()
@@ -184,7 +195,18 @@ class SummonPersona(Resource):
             new_stock = Stock(player_id=player_id, persona_id=selected_persona.id)
             db.session.add(new_stock)
             db.session.commit()
+            
+            # Debugging: Check if persona already exists in the compendium
+            existing_entry = Compendium.query.filter_by(persona_id=selected_persona.id).first()
+            print(f"Compendium entry for persona {selected_persona.id} exists: {existing_entry}")
 
+            if not existing_entry:
+                # Persona not in the compendium, add it
+                new_compendium_entry = Compendium(player_id=player.id, persona_id=selected_persona.id, in_stock=True)
+                db.session.add(new_compendium_entry)
+                print(f"Added new entry to Compendium for Persona ID: {selected_persona.id}")
+
+            db.session.commit()
             # Increment player level by 1 and give yen for leveling up
             player.level += 1
             player.yen += 100  # 100 yen per level up
@@ -213,8 +235,8 @@ class Wildcards(Resource):
 class Compendiums(Resource):
     def get(self):
         # Return all available personas in the compendium (those that have been summoned before)
-        compendium_personas = Compendium.query.all()  # Using the Compendium table
-        return make_response(jsonify([persona.to_dict() for persona in compendium_personas]), 200)
+        compendium_entries = Compendium.query.all()  # Using the Compendium table
+        return make_response(jsonify([persona.to_dict() for persona in compendium_entries]), 200)
 
     def post(self):
         try:

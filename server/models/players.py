@@ -28,7 +28,7 @@ class Player(db.Model, SerializerMixin):
     # Add relationship to Compendium model
     compendiums = db.relationship('Compendium', back_populates='player', cascade="all, delete-orphan")
     # Serialization rules to include Wildcard and exclude password fields
-    serialize_rules = ('-_password_hash','-password_hash', '-wildcard_id',"wildcard")
+    serialize_rules = ('-_password_hash','-password_hash', '-wildcard_id',"wildcard", "-wildcard.players")
 
     @hybrid_property
     def password_hash(self):
