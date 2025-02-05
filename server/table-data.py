@@ -29,7 +29,7 @@ wildcards = [
     {"id": 3, "name": "Ren Amamiya", "image": "ren_amamiya_wildcard.png", "initial_persona_id": 3}
 ]
 
-personas = [
+personas = [ 
     {"id": 1, "name": "Orpheus", "arcana_id": 1, "level": 1, "image": "persona1.png", "in_pool": True, "special": False},
     {"id": 2, "name": "Izanagi", "arcana_id": 1, "level": 1, "image": "persona2.png", "in_pool": True, "special": False},
     {"id": 3, "name": "Arsène", "arcana_id": 1, "level": 1, "image": "persona3.png", "in_pool": True, "special": False},
@@ -144,6 +144,95 @@ personas = [
     {"id": 112, "name": "Atropos", "arcana_id": 11, "level": 56, "image": "persona112.png", "in_pool": True, "special": False},
     {"id": 113, "name": "Norn", "arcana_id": 11, "level": 65, "image": "persona113.png", "in_pool": True, "special": False},
     {"id": 114, "name": "Lakshmi", "arcana_id": 11, "level": 73, "image": "persona114.png", "in_pool": True, "special": False},
+    {"id": 115, "name": "Valkyrie", "arcana_id": 12, "level": 10, "image": "persona115.png", "in_pool": True, "special": False},
+    {"id": 116, "name": "Rakshasa", "arcana_id": 12, "level": 15, "image": "persona116.png", "in_pool": True, "special": False},
+    {"id": 117, "name": "Matador", "arcana_id": 12, "level": 22, "image": "persona117.png", "in_pool": True, "special": False},
+    {"id": 118, "name": "Jikokuten", "arcana_id": 12, "level": 29, "image": "persona118.png", "in_pool": True, "special": False},
+    {"id": 119, "name": "Cerberus", "arcana_id": 12, "level": 35, "image": "persona119.png", "in_pool": True, "special": False},
+    {"id": 120, "name": "Hanuman", "arcana_id": 12, "level": 36, "image": "persona120.png", "in_pool": True, "special": False},
+    {"id": 121, "name": "White Rider", "arcana_id": 12, "level": 46, "image": "persona121.png", "in_pool": True, "special": False},
+    {"id": 122, "name": "Siegfried", "arcana_id": 12, "level": 54, "image": "persona122.png", "in_pool": True, "special": False},
+    {"id": 123, "name": "Kali", "arcana_id": 12, "level": 63, "image": "persona123.png", "in_pool": True, "special": False},
+    {"id": 124, "name": "Atavaka", "arcana_id": 12, "level": 72, "image": "persona124.png", "in_pool": True, "special": False},
+    {"id": 125, "name": "Inugami", "arcana_id": 13, "level": 10, "image": "persona125.png", "in_pool": True, "special": False},
+    {"id": 126, "name": "Take-Minakata", "arcana_id": 13, "level": 20, "image": "persona126.png", "in_pool": True, "special": False},
+    {"id": 127, "name": "Orthrus", "arcana_id": 13, "level": 27, "image": "persona127.png", "in_pool": True, "special": False},
+    {"id": 128, "name": "Vasuki", "arcana_id": 13, "level": 38, "image": "persona128.png", "in_pool": True, "special": False},
+    {"id": 129, "name": "Hecatoncheires", "arcana_id": 13, "level": 47, "image": "persona129.png", "in_pool": True, "special": False},
+    {"id": 130, "name": "Mada", "arcana_id": 13, "level": 57, "image": "persona130.png", "in_pool": True, "special": False},
+    {"id": 131, "name": "Hell Biker", "arcana_id": 13, "level": 65, "image": "persona131.png", "in_pool": True, "special": False},
+    {"id": 132, "name": "Attis", "arcana_id": 13, "level": 73, "image": "persona132.png", "in_pool": True, "special": False},
+    {"id": 133, "name": "Pisaca", "arcana_id": 14, "level": 15, "image": "persona133.png", "in_pool": True, "special": False},
+    {"id": 134, "name": "Pale Rider", "arcana_id": 14, "level": 23, "image": "persona134.png", "in_pool": True, "special": False},
+    {"id": 135, "name": "Loa", "arcana_id": 14, "level": 33, "image": "persona135.png", "in_pool": True, "special": False},
+    {"id": 136, "name": "Samael", "arcana_id": 14, "level": 41, "image": "persona136.png", "in_pool": True, "special": False},
+    {"id": 137, "name": "Mot", "arcana_id": 14, "level": 58, "image": "persona137.png", "in_pool": True, "special": False},
+    {"id": 138, "name": "Alice", "arcana_id": 14, "level": 68, "image": "persona138.png", "in_pool": True, "special": False},
+    {"id": 139, "name": "Nigi Mitama", "arcana_id": 15, "level": 12, "image": "persona139.png", "in_pool": True, "special": False},
+    {"id": 140, "name": "Mitra", "arcana_id": 15, "level": 22, "image": "persona140.png", "in_pool": True, "special": False},
+    {"id": 141, "name": "Genbu", "arcana_id": 15, "level": 30, "image": "persona141.png", "in_pool": True, "special": False},
+    {"id": 142, "name": "Seiryu", "arcana_id": 15, "level": 38, "image": "persona142.png", "in_pool": True, "special": False},
+    {"id": 143, "name": "Okuninushi", "arcana_id": 15, "level": 44, "image": "persona143.png", "in_pool": True, "special": False},
+    {"id": 144, "name": "Suzaku", "arcana_id": 15, "level": 55, "image": "persona144.png", "in_pool": True, "special": False},
+    {"id": 145, "name": "Byakko", "arcana_id": 15, "level": 63, "image": "persona145.png", "in_pool": True, "special": False},
+    {"id": 146, "name": "Yurlungur", "arcana_id": 15, "level": 71, "image": "persona146.png", "in_pool": True, "special": False},
+    {"id": 147, "name": "Lilim", "arcana_id": 16, "level": 8, "image": "persona147.png", "in_pool": True, "special": False},
+    {"id": 148, "name": "Mokoi", "arcana_id": 16, "level": 18, "image": "persona148.png", "in_pool": True, "special": False},
+    {"id": 149, "name": "Baphomet", "arcana_id": 16, "level": 30, "image": "persona149.png", "in_pool": True, "special": False},
+    {"id": 150, "name": "Incubus", "arcana_id": 16, "level": 37, "image": "persona150.png", "in_pool": True, "special": False},
+    {"id": 151, "name": "Succubus", "arcana_id": 16, "level": 47, "image": "persona151.png", "in_pool": True, "special": False},
+    {"id": 152, "name": "Pazuzu", "arcana_id": 16, "level": 56, "image": "persona152.png", "in_pool": True, "special": False},
+    {"id": 153, "name": "Lilith", "arcana_id": 16, "level": 65, "image": "persona153.png", "in_pool": True, "special": False},
+    {"id": 154, "name": "Abaddon", "arcana_id": 16, "level": 76, "image": "persona154.png", "in_pool": True, "special": False},
+    {"id": 155, "name": "Beelzebub", "arcana_id": 16, "level": 81, "image": "persona155.png", "in_pool": True, "special": True},
+    {"id": 156, "name": "Eligor", "arcana_id": 17, "level": 31, "image": "persona156.png", "in_pool": True, "special": False},
+    {"id": 157, "name": "Cu Chulainn", "arcana_id": 17, "level": 40, "image": "persona157.png", "in_pool": True, "special": False},
+    {"id": 158, "name": "Bishamonten", "arcana_id": 17, "level": 60, "image": "persona158.png", "in_pool": True, "special": False},
+    {"id": 159, "name": "Qitian Dasheng", "arcana_id": 17, "level": 67, "image": "persona159.png", "in_pool": True, "special": False},
+    {"id": 160, "name": "Masakado", "arcana_id": 17, "level": 79, "image": "persona160.png", "in_pool": True, "special": False},
+    {"id": 161, "name": "Shiva", "arcana_id": 17, "level": 82, "image": "persona161.png", "in_pool": True, "special": False},
+    {"id": 162, "name": "Chi You", "arcana_id": 17, "level": 86, "image": "persona162.png", "in_pool": True, "special": False},
+    {"id": 163, "name": "Neko Shogun", "arcana_id": 18, "level": 17, "image": "persona163.png", "in_pool": True, "special": True},
+    {"id": 164, "name": "Setanta", "arcana_id": 18, "level": 29, "image": "persona164.png", "in_pool": True, "special": False},
+    {"id": 165, "name": "Kintoki-Douji", "arcana_id": 18, "level": 35, "image": "persona165.png", "in_pool": True, "special": False},
+    {"id": 166, "name": "Cendrillon", "arcana_id": 18, "level": 36, "image": "persona166.png", "in_pool": True, "special": False},
+    {"id": 167, "name": "Kaiwan", "arcana_id": 18, "level": 42, "image": "persona167.png", "in_pool": True, "special": False},
+    {"id": 168, "name": "Ganesha", "arcana_id": 18, "level": 51, "image": "persona168.png", "in_pool": True, "special": False},
+    {"id": 169, "name": "Vanadis", "arcana_id": 18, "level": 58, "image": "persona169.png", "in_pool": True, "special": False},
+    {"id": 170, "name": "Garuda", "arcana_id": 18, "level": 64, "image": "persona170.png", "in_pool": True, "special": False},
+    {"id": 171, "name": "Houou", "arcana_id": 18, "level": 70, "image": "persona171.png", "in_pool": True, "special": False},
+    {"id": 172, "name": "Saturnus", "arcana_id": 18, "level": 76, "image": "persona172.png", "in_pool": True, "special": False},
+    {"id": 173, "name": "Helel", "arcana_id": 18, "level": 88, "image": "persona173.png", "in_pool": True, "special": False},
+    {"id": 174, "name": "Gurulu", "arcana_id": 19, "level": 14, "image": "persona174.png", "in_pool": True, "special": False},
+    {"id": 175, "name": "Yamata-no-Orochi", "arcana_id": 19, "level": 25, "image": "persona175.png", "in_pool": True, "special": False},
+    {"id": 176, "name": "Kaguya", "arcana_id": 19, "level": 34, "image": "persona176.png", "in_pool": True, "special": False},
+    {"id": 177, "name": "Girimekhala", "arcana_id": 19, "level": 39, "image": "persona177.png", "in_pool": True, "special": False},
+    {"id": 178, "name": "Dionysus", "arcana_id": 19, "level": 49, "image": "persona178.png", "in_pool": True, "special": False},
+    {"id": 179, "name": "Chernobog", "arcana_id": 19, "level": 56, "image": "persona179.png", "in_pool": True, "special": False},
+    {"id": 180, "name": "Seth", "arcana_id": 19, "level": 62, "image": "persona180.png", "in_pool": True, "special": False},
+    {"id": 181, "name": "Baal Zebul", "arcana_id": 19, "level": 72, "image": "persona181.png", "in_pool": True, "special": False},
+    {"id": 182, "name": "Sandalphon", "arcana_id": 19, "level": 80, "image": "persona182.png", "in_pool": True, "special": False},
+    {"id": 183, "name": "Yatagarasu", "arcana_id": 20, "level": 24, "image": "persona183.png", "in_pool": True, "special": False},
+    {"id": 184, "name": "Thunderbird", "arcana_id": 20, "level": 35, "image": "persona184.png", "in_pool": True, "special": False},
+    {"id": 185, "name": "Quetzalcoatl", "arcana_id": 20, "level": 45, "image": "persona185.png", "in_pool": True, "special": False},
+    {"id": 186, "name": "Jatayu", "arcana_id": 20, "level": 55, "image": "persona186.png", "in_pool": True, "special": False},
+    {"id": 187, "name": "Horus", "arcana_id": 20, "level": 67, "image": "persona187.png", "in_pool": True, "special": False},
+    {"id": 188, "name": "Vishnu", "arcana_id": 20, "level": 78, "image": "persona188.png", "in_pool": True, "special": False},
+    {"id": 189, "name": "Asura", "arcana_id": 20, "level": 85, "image": "persona189.png", "in_pool": True, "special": False},
+    {"id": 190, "name": "Anubis", "arcana_id": 21, "level": 40, "image": "persona190.png", "in_pool": True, "special": False},
+    {"id": 191, "name": "Trumpeter", "arcana_id": 21, "level": 59, "image": "persona191.png", "in_pool": True, "special": False},
+    {"id": 192, "name": "Michael", "arcana_id": 21, "level": 70, "image": "persona192.png", "in_pool": True, "special": False},
+    {"id": 193, "name": "Satan", "arcana_id": 21, "level": 82, "image": "persona193.png", "in_pool": True, "special": False},
+    {"id": 194, "name": "Nidhoggr", "arcana_id": 22, "level": 47, "image": "persona194.png", "in_pool": True, "special": False},
+    {"id": 195, "name": "Uriel", "arcana_id": 22, "level": 57, "image": "persona195.png", "in_pool": True, "special": False},
+    {"id": 196, "name": "Ananta", "arcana_id": 22, "level": 73, "image": "persona196.png", "in_pool": True, "special": False},
+    {"id": 197, "name": "Metatron", "arcana_id": 22, "level": 87, "image": "persona197.png", "in_pool": True, "special": False}
+    ]
+
+        
+
+
+
 
 
     
@@ -153,4 +242,3 @@ personas = [
 
 
 
-]
