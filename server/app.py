@@ -183,7 +183,13 @@ class SummonPersona(Resource):
                 eligible_personas = Persona.query.filter(Persona.level >= min_level, Persona.level <= max_level).all()
             if not eligible_personas:
                 return {'error': 'No personas available for your level range.'}, 404
+            # Exclude personas that are already in the player's stock
+            stock_personas = [stock.persona_id for stock in player.stocks]
+            eligible_personas = [persona for persona in eligible_personas if persona.id not in stock_personas]
 
+            # If no eligible personas are left after filtering out those in stock
+            if not eligible_personas:
+                return {'error': 'You already have all available personas in your stock.'}, 400
             # Randomly select a persona from eligible personas
             selected_persona = random.choice(eligible_personas)
             print(type(selected_persona))
@@ -222,15 +228,27 @@ class SummonPersona(Resource):
             return {'error': f'An error occurred: {str(e)}'}, 500
 
 class Wildcards(Resource):
-    def get(self, wildcard_id=None):
-        if wildcard_id:  # If an ID is provided, retrieve that specific wildcard
-            wildcard = Wildcard.query.get(wildcard_id)
-            if not wildcard:
-                return {'error': 'Wildcard not found'}, 404
-            return wildcard.to_dict(), 200
-        else:  # If no ID is provided, return all wildcards
+    def get(self):
+        try:
+            json = request.get_json()
+            player_id = session.get('player_id')
+            if not player_id:
+             return {'error': 'Unauthorized, please log in first'}, 401
+            
+            # Assuming you have a Wildcards model, you can fetch all wildcards
             wildcards = Wildcard.query.all()
-            return make_response(jsonify([wildcard.to_dict() for wildcard in wildcards]), 200)
+            
+            # If no wildcards found
+            if not wildcards:
+                return {'error': 'No wildcards found'}, 404
+            
+            # Return the wildcards
+            return {
+                'wildcards': [wc.to_dict(only=("name", "image",)) for wc in wildcards]
+            }, 200
+        
+        except Exception as e:
+            return {'error': f'An error occurred: {str(e)}'}, 500
 
 class Compendiums(Resource):
     def get(self):
@@ -251,41 +269,56 @@ class Compendiums(Resource):
                 return {'error': 'No compendium entries found for this player'}, 404
 
          # Return all personas in the compendium
-            return make_response([compendium_entry.persona.to_dict(only=("name", "level", "calculated_price")) for compendium_entry in compendium_entries], 200)
+            return make_response([compendium_entry.persona.to_dict(only=("name", "level", "calculated_price", "arcana.name")) for compendium_entry in compendium_entries], 200)
 class BuyPersonaById(Resource):
-    def post(self):
+    def post(self, persona_id):
         try:
             json = request.get_json()
+
+            # Ensure the player is logged in
+            
+            player_id = session.get('player_id')
+            if not player_id:
+                return {'error': 'Unauthorized, please log in first'}, 401
             player_id = session.get('player_id')  # Ensure the player is logged in
             player = Player.query.get(player_id)
             if not player:
                 return {'error': 'Player not found'}, 404
-
-            # Retrieve the persona the player wants to buy
-            persona = Persona.query.get(json['persona_id'])
+            # Check if player's stock is full
+            if len(player.stocks) >= player.stock_limit:
+                return {'error': 'You have reached your stock limit.'}, 400
+            persona = Persona.query.get(persona_id)  # Use the persona_id passed in the URL directly
             if not persona:
                 return {'error': 'Persona not found'}, 404
 
-            # Ensure the persona is in the compendium (based on the Compendium table)
-            if not Compendium.query.filter_by(persona_id=persona.id).first():  # Adjusted to check the Compendium table
-                return {'error': 'Persona not available in the compendium'}, 400
-
+            # # Ensure the persona is in the compendium (based on the Compendium table)
+            # if not Compendium.query.filter_by(player_id=player_id, persona_id=persona.id).first():  # Adjusted to check the Compendium table
+            #     return {'error': 'Persona not available in the compendium'}, 400
+            # Retrieve the persona from the compendium (not the personas table)
+            compendium_entry = Compendium.query.filter_by(player_id=player_id, persona_id=persona_id).first()
+            if not compendium_entry:
+                return {'error': 'Persona not found in the compendium'}, 404
             # Ensure the player doesn't already have this persona in their stock
             if Stock.query.filter_by(player_id=player_id, persona_id=persona.id).first():
                 return {'error': 'Persona is already in your stock'}, 400
 
             # Check if the player has enough yen
-            if player.yen < persona.price:
+            if player.yen < persona.calculated_price:
                 return {'error': 'Not enough yen'}, 400
 
             # Deduct yen and add the persona to the stock
-            player.yen -= persona.price
+            player.yen -= persona.calculated_price
+            db.session.commit()
+
+            # Add the persona to the player's stock
             new_stock = Stock(player_id=player_id, persona_id=persona.id)
             db.session.add(new_stock)
 
             db.session.commit()
 
-            return persona.to_dict(), 201
+            # Return success message with persona data
+            return {'message': 'Persona purchased and added to stock successfully', 
+                    'persona': persona.to_dict(only=("name", "arcana.name", "level"))}, 201
 
         except Exception as e:
             db.session.rollback()
@@ -316,7 +349,7 @@ class ReleasePersonaById(Resource):
                 return {'error': 'Persona not found'}, 404
 
             # Calculate yen reward based on persona's level
-            yen_reward = persona.level * 100  # For example, 100 yen per level of the persona
+            yen_reward = persona.level * 50  # For example, 50 yen per level of the persona
 
             # Remove the persona from the player's stock
             db.session.delete(stock_entry)
@@ -331,17 +364,10 @@ class ReleasePersonaById(Resource):
             db.session.rollback()
             return {'error': f'An error occurred: {str(e)}'}, 500
 
-class ArcanaById(Resource):
-    def get(self, arcana_id):
-        # Retrieve a specific arcana by ID
-        arcana = Arcana.query.get(arcana_id)
-        if not arcana:
-            return {'error': 'Arcana not found'}, 404
-        return arcana.to_dict(), 200
-
-class Fusion(Resource):
-    def post(self):
+class FusePersonasById(Resource):
+    def post(self, persona_1_id, persona_2_id):
         try:
+            json = request.get_json()
             player_id = session.get('player_id')
             if not player_id:
                 return {'error': 'Unauthorized, please log in first'}, 401
@@ -350,10 +376,6 @@ class Fusion(Resource):
             if not player:
                 return {'error': 'Player not found'}, 404
 
-            json = request.get_json()
-            persona_1_id = json.get('persona_1_id')
-            persona_2_id = json.get('persona_2_id')
-
             persona_1 = Persona.query.get(persona_1_id)
             persona_2 = Persona.query.get(persona_2_id)
 
@@ -361,32 +383,48 @@ class Fusion(Resource):
                 return {'error': 'Invalid persona(s) selected'}, 400
 
             # Ensure player has both personas in their stock
-            if not any(stock.persona_id == persona_1.id for stock in player.stock) or \
-               not any(stock.persona_id == persona_2.id for stock in player.stock):
+            if not any(stock.persona_id == persona_1.id for stock in player.stocks) or \
+               not any(stock.persona_id == persona_2.id for stock in player.stocks):
                 return {'error': 'You must have both personas in your stock to fuse them.'}, 400
-
+            
+            # Get the arcana names
+            arcana_1_name = persona_1.arcana.name
+            arcana_2_name = persona_2.arcana.name
             # Get fusion result from the arcana mapping
-            fusion_result = arcana_map.get((persona_1.arcana_id, persona_2.arcana_id))
+            fusion_result = arcana_map.get(arcana_1_name,{}).get(arcana_2_name)
 
             if not fusion_result:
                 return {'error': 'These personas cannot be fused together.'}, 400
-
-            resulting_persona = Persona.query.get(fusion_result)
-            if not resulting_persona:
+            fused_arcana_id= Arcana.query.filter_by(name=fusion_result).first().id
+            resulting_persona = Persona.query.filter(Persona.arcana_id==fused_arcana_id, Persona.level<player.level + 3, Persona.level>player.level -3).all()
+            fused_persona = random.choice(resulting_persona)
+            if not fused_persona:
                 return {'error': 'Fusion result persona not found'}, 404
 
-            # Check if the player's level is sufficient for the fusion
-            if player.level < resulting_persona.required_level:
-                return {'error': f'You need to be level {resulting_persona.required_level} to fuse this persona.'}, 400
+            # # Check if the player's level is sufficient for the fusion
+            # if player.level < resulting_persona.level:
+            #     return {'error': f'You need to be level {resulting_persona.level} to fuse this persona.'}, 400
 
-            # Remove the fused personas from stock
+            # Remove the fused persona materials from stock
             Stock.query.filter(Stock.player_id == player_id, Stock.persona_id == persona_1.id).delete()
             Stock.query.filter(Stock.player_id == player_id, Stock.persona_id == persona_2.id).delete()
 
             # Add the resulting persona to stock
-            new_stock = Stock(player_id=player_id, persona_id=resulting_persona.id)
+            new_stock = Stock(player_id=player_id, persona_id=fused_persona.id)
             db.session.add(new_stock)
             db.session.commit()
+
+            # Debugging: Check if persona already exists in the compendium
+            existing_entry = Compendium.query.filter_by(persona_id=fused_persona.id).first()
+            print(f"Compendium entry for persona {fused_persona.id} exists: {existing_entry}")
+
+            if not existing_entry:
+                # Persona not in the compendium, add it
+                new_compendium_entry = Compendium(player_id=player.id, persona_id=fused_persona.id, in_stock=True)
+                db.session.add(new_compendium_entry)
+                print(f"Added new entry to Compendium for Persona ID: {fused_persona.id}")
+
+                db.session.commit()
             # Level up the player and give yen based on level increase
             level_up_amount = 5  
             player.level += level_up_amount
@@ -397,7 +435,7 @@ class Fusion(Resource):
 
             db.session.commit()
 
-            return make_response(resulting_persona.to_dict()), 201
+            return make_response(fused_persona.to_dict(only=("name", "arcana.name", "level" )), 201)
 
         except Exception as e:
             db.session.rollback()
@@ -428,6 +466,26 @@ class UpdatePlayerProfile(Resource):
         except Exception as e:
             db.session.rollback()
             return {'error': f'An error occurred: {str(e)}'}, 500
+class Stocks(Resource):
+    def get(self):
+            json = request.get_json()
+            player_id = session.get('player_id')
+            if not player_id:
+                return {'error': 'Unauthorized, please log in first'}, 401
+            
+            
+            player_id = session.get('player_id')  # Ensure the player is logged in
+            player = Player.query.get(player_id)
+            if not player:
+                return {'error': 'Player not found'}, 404
+            
+            # Retrieve all stock entries for the player
+            stock_entries = Stock.query.filter_by(player_id=player_id).all()
+            if not stock_entries:
+                return {'error': 'No stock entries found for this player'}, 404
+
+         # Return all personas in the compendium
+            return make_response([stock_entry.persona.to_dict(only=("name", "level", "arcana.name")) for stock_entry in stock_entries], 200)
 
 api.add_resource(ClearSession, '/api/clear', endpoint='clear')
 api.add_resource(Signup, '/api/signup', endpoint='signup')
@@ -439,11 +497,11 @@ api.add_resource(PersonaByID, '/api/personas/<int:persona_id>', endpoint='person
 api.add_resource(SummonPersona, '/api/summon-persona', endpoint='summon_persona')
 api.add_resource(Wildcards, '/api/wildcards', endpoint='wildcards')
 api.add_resource(Compendiums, '/api/compendiums', endpoint='compendiums')
-api.add_resource(BuyPersonaById, '/api/buy-persona/<int:persona_id>', endpoint='stock')
+api.add_resource(BuyPersonaById, '/api/buy-persona/<int:persona_id>', endpoint='buy_persona')
 api.add_resource(ReleasePersonaById, '/api/release-persona/<int:persona_id>', endpoint='release_persona')
-api.add_resource(ArcanaById, '/api/arcanas/<int:arcana_id>', endpoint='arcana_by_id')
-api.add_resource(Fusion, '/api/fusion', endpoint='fusion')
+api.add_resource(FusePersonasById, '/api/fuse-personas/<int:persona_1_id>/<int:persona_2_id>', endpoint='fuse-personas')
 api.add_resource(UpdatePlayerProfile, '/api/update-player-profile', endpoint='update_player_profile')
+api.add_resource(Stocks, '/api/stocks', endpoint='stocks')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
