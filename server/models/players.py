@@ -28,7 +28,7 @@ class Player(db.Model, SerializerMixin):
     # Add relationship to Compendium model
     compendiums = db.relationship('Compendium', back_populates='player', cascade="all, delete-orphan")
     # Serialization rules to include Wildcard and exclude password fields
-    serialize_rules = ('-_password_hash','-password_hash', '-wildcard_id',"wildcard",)
+    serialize_rules = ('-_password_hash', '-password_hash', '-wildcard_id', '-stocks.player', '-compendiums.player', '-wildcard.players')
 
     @hybrid_property
     def password_hash(self):
@@ -69,7 +69,7 @@ class Player(db.Model, SerializerMixin):
     def __repr__(self):
         return (f'<Player id: {self.id} Username: {self.username} '
                 f'Level: {self.level} Wildcard ID: {self.wildcard_id} '
-                f'Yen: {self.yen}>')
+                f'Yen: {self.yen} Stock Limit: {self.stock_limit}>')
 
     def update_stock_limit(self):
         """Increase stock limit by 1 every 10 levels, capped at 12."""

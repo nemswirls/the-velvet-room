@@ -19,7 +19,7 @@ class Persona(db.Model, SerializerMixin):
     
     arcana = db.relationship("Arcana", back_populates="personas")
     wildcards =db.relationship("Wildcard", back_populates="initial_persona")
-    compendium_entries = db.relationship("Compendium", back_populates="persona")
+    compendiums = db.relationship("Compendium", back_populates="persona")
     stocks = db.relationship("Stock", back_populates="persona")
     # Relationships for special fusions
     # special_fusion_materials = db.relationship(
@@ -32,12 +32,13 @@ class Persona(db.Model, SerializerMixin):
     #     foreign_keys='Special_Material.material_id',
     #     back_populates='material'
     # )
+     # Serialization rules
+    serialize_rules = ('-arcana.personas', '-wildcards.initial_persona', '-compendiums.persona', '-stocks.persona',)
 
     __table_args__ = (
         CheckConstraint('level >= 1', name='level_greater_than_zero'),
     )
-     # Serialization rules
-    serialize_rules = ('-arcana.personas','-wildcard.initial_persona', "-compendium_entries.persona")
+    
     
     @hybrid_property
     def calculated_price(self):

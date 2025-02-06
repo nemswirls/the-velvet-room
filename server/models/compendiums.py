@@ -17,10 +17,10 @@ class Compendium(db.Model, SerializerMixin):
     player = db.relationship('Player', back_populates='compendiums')
 
     # Relationship to Persona
-    persona = db.relationship('Persona', back_populates='compendium_entries')
+    persona = db.relationship('Persona', back_populates='compendiums')
 
     # Serialization rules
-    serialize_rules = ('-player.compendiums', '-persona.compendium_entries')
+    serialize_rules = ('-player.compendiums', '-persona.compendiums')
 
     __table_args__ = (
         CheckConstraint('in_stock IN (0, 1)', name='check_in_stock_boolean'),
