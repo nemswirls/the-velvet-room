@@ -461,7 +461,7 @@ class UpdatePlayerProfile(Resource):
 
             db.session.commit()
 
-            return player.to_dict(), 200
+            return player.to_dict(only=("username", "_password_hash")), 200
 
         except Exception as e:
             db.session.rollback()
