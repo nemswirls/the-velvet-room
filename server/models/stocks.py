@@ -12,14 +12,11 @@ class Stock(db.Model, SerializerMixin):
     player_id = db.Column(db.Integer, db.ForeignKey("players.id"), nullable=False)  
     persona_id = db.Column(db.Integer, db.ForeignKey("personas.id"), nullable=False)
 
-    # Relationship with Player
-    player = db.relationship('Player', back_populates='stocks')
-
-    # Relationship with Persona
-    persona = db.relationship('Persona', back_populates='stocks')
+    player = db.relationship('Player', back_populates='stocks', lazy="select")
+    persona = db.relationship('Persona', back_populates='stocks', lazy="select")
 
     # Serialization rules
-    serialize_rules = ('-player.stocks', '-persona.stocks')
+    serialize_rules = ('-player.stocks', '-persona.stocks',)
 
     def __repr__(self):
         return f'<Stock id: {self.id} Player ID: {self.player_id} Persona ID: {self.persona_id}>'

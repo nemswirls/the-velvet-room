@@ -13,27 +13,15 @@ class Persona(db.Model, SerializerMixin):
     level = db.Column(db.Integer, nullable=False)
     in_pool = db.Column(db.Boolean, default=True)
     arcana_id = db.Column(db.Integer, db.ForeignKey('arcanas.id'), nullable=False)
-    # price = db.Column(db.Integer, nullable= False)
     special = db.Column(db.Boolean, default=False)
     image = db.Column(db.String)
     
     arcana = db.relationship("Arcana", back_populates="personas")
-    wildcard =db.relationship("Wildcard", back_populates="initial_persona")
-    compendium_entries = db.relationship("Compendium", back_populates="persona")
-    stocks = db.relationship("Stock", back_populates="persona")
-    # Relationships for special fusions
-    # special_fusion_materials = db.relationship(
-    #     'Special_Material',
-    #     foreign_keys='Special_Material.special_fusion_id',
-    #     back_populates='special_fusion'
-    # )
-    # material_for_special_fusions = db.relationship(
-    #     'Special_Material',
-    #     foreign_keys='Special_Material.material_id',
-    #     back_populates='material'
-    # )
+    wildcard = db.relationship("Wildcard", back_populates="initial_persona", uselist=False, lazy="select")
+    stocks = db.relationship("Stock", back_populates="persona", lazy="select")
+    compendiums = db.relationship("Compendium", back_populates="persona", lazy="select")
      # Serialization rules
-    serialize_rules = ('-arcana.personas', '-wildcard.initial_persona', '-compendium_entries.persona', '-stocks.persona',)
+    serialize_rules = ('-arcana.personas', '-wildcard.initial_persona', '-compendiums.persona', '-stocks.persona', )
 
     __table_args__ = (
         CheckConstraint('level >= 1', name='level_greater_than_zero'),
@@ -50,6 +38,4 @@ class Persona(db.Model, SerializerMixin):
         # The SQL equivalent of the calculation, so that it can be used in queries
         return cls.level * 100
     def __repr__(self):
-        return (f'<Persona id: {self.id} Name: {self.name} (Level {self.level}) '
-            f'Special: {self.special} Arcana ID: {self.arcana_id} '
-            f'In Pool: {self.in_pool} Image: {self.image}>')
+        return f"<Persona(id={self.id}, name='{self.name}', level={self.level})>"

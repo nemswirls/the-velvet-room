@@ -1,6 +1,7 @@
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy.orm import validates
+from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import CheckConstraint
 from config import db, bcrypt
@@ -20,15 +21,12 @@ class Player(db.Model, SerializerMixin):
     # Ensure level never exceeds 99 at the DB level
     __table_args__ = (CheckConstraint('level <= 99', name='check_max_level'),)
 
-    # Relationship with Wildcard
-    wildcard = db.relationship("Wildcard", back_populates="players")
-
-    # Add relationship to Stock model
-    stocks = db.relationship('Stock', back_populates='player', cascade="all, delete-orphan")
-    # Add relationship to Compendium model
-    compendiums = db.relationship('Compendium', back_populates='player', cascade="all, delete-orphan")
+    wildcard = db.relationship("Wildcard", back_populates="players", lazy="select")
+    stocks = db.relationship("Stock", back_populates="player", lazy="select", cascade="all, delete-orphan")
+    personas= association_proxy("stocks", "persona")
+    compendiums = db.relationship("Compendium", back_populates="player", lazy="select", cascade="all, delete-orphan")
     # Serialization rules to include Wildcard and exclude password fields
-    serialize_rules = ('-_password_hash', '-password_hash', '-wildcard_id', '-stocks.player', '-compendiums.player', '-wildcard.players')
+    serialize_rules = ('-_password_hash', '-password_hash', '-wildcard_id', '-wildcard.players',"-wildcard.initial_persona", '-stocks.player', '-compendiums.player', "-stocks.persona", "-personas.stocks", "-personas.wildcard", "-personas.compendiums")
 
     @hybrid_property
     def password_hash(self):
@@ -67,9 +65,7 @@ class Player(db.Model, SerializerMixin):
         return value
 
     def __repr__(self):
-        return (f'<Player id: {self.id} Username: {self.username} '
-                f'Level: {self.level} Wildcard ID: {self.wildcard_id} '
-                f'Yen: {self.yen} Stock Limit: {self.stock_limit}>')
+        return f"<Player(id={self.id}, username='{self.username}', level={self.level}, yen={self.yen})>"
 
     def update_stock_limit(self):
         """Increase stock limit by 1 every 10 levels, capped at 12."""
@@ -87,4 +83,4 @@ class Player(db.Model, SerializerMixin):
             self.stock_limit = 11
         else:
             self.stock_limit = 12  # Cap at 12
-        
+    

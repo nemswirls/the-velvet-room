@@ -65,8 +65,8 @@ class CheckSession(Resource):
         
         player_id = session.get('player_id', 0)
         if player_id:
-            user = Player.query.filter(Player.id == player_id).first()
-            return user.to_dict(), 200
+            player = Player.query.filter(Player.id == player_id).first()
+            return player.to_dict(only=("username","wildcard","personas","level", "yen", "stock_limit",)), 200
         
         return {}, 204
 
@@ -82,7 +82,7 @@ class Login(Resource):
                 return {'error': 'Invalid username or password'}, 401
 
             session['player_id'] = player.id  # Store player ID in the session
-            return player.to_dict(), 200
+            return player.to_dict(only=("username","wildcard","personas","level", "yen", "stock_limit",)), 200
         except Exception as e:
             return {'error': f'An error occurred: {str(e)}'}, 500
 
@@ -128,19 +128,19 @@ class ChooseWildcard(Resource):
                 new_stock = Stock(player_id=player.id, persona_id=initial_persona.id)
                 db.session.add(new_stock)
 
-            db.session.commit()
-            # # Check if persona already exists in the compendium
-            # existing_entry = Compendium.query.filter_by(persona_id=initial_persona.id).first()
-            # print(f"Compendium entry for persona {initial_persona.id} exists: {existing_entry}")
+                db.session.commit()
+            # Check if persona already exists in the compendium
+            existing_entry = Compendium.query.filter_by(player_id=player.id, persona_id=initial_persona.id).first()
+            print(f"Compendium entry for persona {initial_persona.id} exists: {existing_entry}")
 
-            # if not existing_entry:
-            #     # Persona not in the compendium, add it
-            #     new_compendium_entry = Compendium(player_id=player.id, persona_id=initial_persona.id, in_stock=True)
-            #     db.session.add(new_compendium_entry)
-            #     print(f"Added new entry to Compendium for Persona ID: {initial_persona.id}")
+            if not existing_entry:
+                # Persona not in the compendium, add it
+                new_compendium_entry = Compendium(player_id=player.id, persona_id=initial_persona.id, in_stock=True)
+                db.session.add(new_compendium_entry)
+                print(f"Added new entry to Compendium for Persona ID: {initial_persona.id}")
 
-            # db.session.commit()
-            return {'message': 'Wildcard chosen successfully', 'player': player.to_dict()}, 200
+                db.session.commit()
+            return {'message': 'Wildcard chosen successfully', 'player': player.to_dict(only=("username","wildcard","level","personas"))}, 200
         except Exception as e:
             db.session.rollback()
             return {'error': f'An error occurred: {str(e)}'}, 500
@@ -215,8 +215,8 @@ class SummonPersona(Resource):
             # Update stock limit based on the new level
             player.update_stock_limit()
             db.session.commit()
-            return make_response(selected_persona.to_dict(), 201)
-
+            return make_response(selected_persona.to_dict(only=("name", "level", "arcana.name", "image")), 201)
+            
         except Exception as e:
             db.session.rollback()  # Rollback on error
             return {'error': f'An error occurred: {str(e)}'}, 500
@@ -234,10 +234,25 @@ class Wildcards(Resource):
 
 class Compendiums(Resource):
     def get(self):
-        # Return all available personas in the compendium (those that have been summoned before)
-        compendium_entries = Compendium.query.all()  # Using the Compendium table
-        return make_response(jsonify([persona.to_dict() for persona in compendium_entries]), 200)
+            json = request.get_json()
+            player_id = session.get('player_id')
+            if not player_id:
+                return {'error': 'Unauthorized, please log in first'}, 401
+            
+            
+            player_id = session.get('player_id')  # Ensure the player is logged in
+            player = Player.query.get(player_id)
+            if not player:
+                return {'error': 'Player not found'}, 404
+            
+            # Retrieve all compendium entries for the player
+            compendium_entries = Compendium.query.filter_by(player_id=player_id).all()
+            if not compendium_entries:
+                return {'error': 'No compendium entries found for this player'}, 404
 
+         # Return all personas in the compendium
+            return make_response([compendium_entry.persona.to_dict(only=("name", "level", "calculated_price")) for compendium_entry in compendium_entries], 200)
+class BuyPersonaById(Resource):
     def post(self):
         try:
             json = request.get_json()
@@ -277,7 +292,7 @@ class Compendiums(Resource):
             return {'error': f'An error occurred: {str(e)}'}, 500
 
 class ReleasePersonaById(Resource):
-    def delete(self):
+    def delete(self, persona_id):
         try:
             json = request.get_json()
             player_id = session.get('player_id')
@@ -289,7 +304,7 @@ class ReleasePersonaById(Resource):
             if not player:
                 return {'error': 'Player not found'}, 404
 
-            persona_id = json.get('persona_id')
+            
             stock_entry = Stock.query.filter_by(player_id=player_id, persona_id=persona_id).first()
 
             if not stock_entry:
@@ -424,7 +439,8 @@ api.add_resource(PersonaByID, '/api/personas/<int:persona_id>', endpoint='person
 api.add_resource(SummonPersona, '/api/summon-persona', endpoint='summon_persona')
 api.add_resource(Wildcards, '/api/wildcards', endpoint='wildcards')
 api.add_resource(Compendiums, '/api/compendiums', endpoint='compendiums')
-api.add_resource(ReleasePersonaById, '/api/release-persona', endpoint='release_persona')
+api.add_resource(BuyPersonaById, '/api/buy-persona/<int:persona_id>', endpoint='stock')
+api.add_resource(ReleasePersonaById, '/api/release-persona/<int:persona_id>', endpoint='release_persona')
 api.add_resource(ArcanaById, '/api/arcanas/<int:arcana_id>', endpoint='arcana_by_id')
 api.add_resource(Fusion, '/api/fusion', endpoint='fusion')
 api.add_resource(UpdatePlayerProfile, '/api/update-player-profile', endpoint='update_player_profile')

@@ -11,16 +11,12 @@ class Compendium(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     player_id = db.Column(db.Integer, db.ForeignKey('players.id'), nullable=False)
     persona_id = db.Column(db.Integer, db.ForeignKey('personas.id'), nullable=False)
-    in_stock = db.Column(db.Boolean, default=True)
+    in_stock = db.Column(db.Boolean, default=True, nullable=False)
 
-    # Relationship to Player
-    player = db.relationship('Player', back_populates='compendiums')
-
-    # Relationship to Persona
-    persona = db.relationship('Persona', back_populates='compendium_entries')
-
+    player = db.relationship('Player', back_populates='compendiums', lazy="select")
+    persona = db.relationship('Persona', back_populates='compendiums', lazy="select")
     # Serialization rules
-    serialize_rules = ('-player.compendiums', '-persona.compendium_entries')
+    serialize_rules = ('-player.compendiums', '-persona.compendiums',)
 
     __table_args__ = (
         CheckConstraint('in_stock IN (0, 1)', name='check_in_stock_boolean'),
@@ -30,5 +26,4 @@ class Compendium(db.Model, SerializerMixin):
     
     
     def __repr__(self):
-        return (f'<Compendium id: {self.id} Player id: {self.player_id} '
-                f'Persona id: {self.persona_id} In stock: {self.in_stock}>')
+        return f"<Compendium(id={self.id}, player_id={self.player_id}, persona_id={self.persona_id}, in_stock={self.in_stock})>"
