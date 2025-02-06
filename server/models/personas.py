@@ -18,7 +18,7 @@ class Persona(db.Model, SerializerMixin):
     image = db.Column(db.String)
     
     arcana = db.relationship("Arcana", back_populates="personas")
-    wildcard =db.relationship("Wildcard", back_populates="initial_persona")
+    wildcards =db.relationship("Wildcard", back_populates="initial_persona")
     compendium_entries = db.relationship("Compendium", back_populates="persona")
     stocks = db.relationship("Stock", back_populates="persona")
     # Relationships for special fusions

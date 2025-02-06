@@ -14,21 +14,21 @@ class Special_Material(db.Model, SerializerMixin):
     material_id = db.Column(db.Integer, db.ForeignKey("personas.id"), nullable=False)
 
     # Relationship with Wildcard
-    wildcard = db.relationship("Wildcard", backref="special_materials")
-    # Relationship for the special fusion persona
-    special_fusion = db.relationship(
-        'Persona',
-        foreign_keys=[special_fusion_id],
-        back_populates='special_fusion_materials'
-    )
-    material = db.relationship(
-        'Persona',
-        foreign_keys=[material_id],
-        back_populates='material_for_special_fusions'
-    )
-    # Relationship to Personas (special_fusion_id and material_id)
-    special_fusion = db.relationship("Persona", foreign_keys=[special_fusion_id], backref="special_fusion_materials")
-    material = db.relationship("Persona", foreign_keys=[material_id], backref="special_materials")
+    # wildcard = db.relationship("Wildcard", backref="special_materials")
+    # # Relationship for the special fusion persona
+    # special_fusion = db.relationship(
+    #     'Persona',
+    #     foreign_keys=[special_fusion_id],
+    #     back_populates='special_fusion_materials'
+    # )
+    # material = db.relationship(
+    #     'Persona',
+    #     foreign_keys=[material_id],
+    #     back_populates='material_for_special_fusions'
+    # )
+    # # Relationship to Personas (special_fusion_id and material_id)
+    # special_fusion = db.relationship("Persona", foreign_keys=[special_fusion_id], backref="special_fusion_materials")
+    # material = db.relationship("Persona", foreign_keys=[material_id], backref="special_materials")
 
     serialize_rules = ('-wildcard.special_materials', '-special_fusion.special_materials', '-material.special_materials')
 

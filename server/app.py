@@ -268,11 +268,6 @@ class Compendiums(Resource):
             new_stock = Stock(player_id=player_id, persona_id=persona.id)
             db.session.add(new_stock)
 
-            # Optionally, add the persona to the compendium if it hasn't been added before
-            if not Compendium.query.filter_by(persona_id=persona.id).first():  # Adjusted to check the Compendium table
-                new_compendium_entry = Compendium(persona_id=persona.id)  # Assuming the Compendium table has a persona_id column
-                db.session.add(new_compendium_entry)
-
             db.session.commit()
 
             return persona.to_dict(), 201
@@ -387,7 +382,7 @@ class Fusion(Resource):
 
             db.session.commit()
 
-            return jsonify(resulting_persona.to_dict()), 201
+            return make_response(resulting_persona.to_dict()), 201
 
         except Exception as e:
             db.session.rollback()

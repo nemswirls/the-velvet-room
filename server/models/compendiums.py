@@ -20,7 +20,7 @@ class Compendium(db.Model, SerializerMixin):
     persona = db.relationship('Persona', back_populates='compendium_entries')
 
     # Serialization rules
-    serialize_rules = ('-player.compendiums', '-persona.compendiums')
+    serialize_rules = ('-player.compendiums', '-persona.compendium_entries')
 
     __table_args__ = (
         CheckConstraint('in_stock IN (0, 1)', name='check_in_stock_boolean'),
@@ -31,4 +31,4 @@ class Compendium(db.Model, SerializerMixin):
     
     def __repr__(self):
         return (f'<Compendium id: {self.id} Player id: {self.player_id} '
-                f'Persona id: {self.persona_id} In stock: {self.in_stock} ')
+                f'Persona id: {self.persona_id} In stock: {self.in_stock}>')

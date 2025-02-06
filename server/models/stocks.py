@@ -9,7 +9,7 @@ class Stock(db.Model, SerializerMixin):
     __tablename__ = "stocks"
 
     id = db.Column(db.Integer, primary_key=True)
-    player_id = db.Column(db.Integer, db.ForeignKey("players.id"), nullable=False)  # Corrected reference
+    player_id = db.Column(db.Integer, db.ForeignKey("players.id"), nullable=False)  
     persona_id = db.Column(db.Integer, db.ForeignKey("personas.id"), nullable=False)
 
     # Relationship with Player
