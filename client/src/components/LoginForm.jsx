@@ -20,7 +20,11 @@ const validationSchema = Yup.object({
       .min(3, "Username must be at least 3 characters long"), // Minimum 3 characters
     password: Yup.string()
       .required("Password is required") // Password must be provided
-      .min(6, "Password must be at least 6 characters long") // Minimum 6 characters
+      .min(8, "Password must be at least 8 characters long") // Minimum 8 characters
+      .matches(/[A-Z]/, "Password must include at least one uppercase letter.")
+      .matches(/[a-z]/, "Password must include at least one lowercase letter.")
+      .matches(/\d/, "Password must include at least one number.")
+      .matches(/[!@#$%^&*(),.?":{}|<>]/, "Password must include at least one special character.")
   });
   const formik = useFormik({
     initialValues: {
