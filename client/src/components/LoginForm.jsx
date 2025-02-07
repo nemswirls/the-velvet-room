@@ -30,7 +30,7 @@ const LoginForm = () => {
     validationSchema,
     onSubmit: async (values) => {
       try {
-        const response = await axios.post('/api/login', values, { withCredentials: true })
+        const response = await axios.post("http://127.0.0.1:5555/api/login", values, { withCredentials: true })
         console.log("Login successful:", response.data);
         setUser(response.data);
         navigate("/home"); // Redirect to home after successful login

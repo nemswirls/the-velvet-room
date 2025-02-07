@@ -33,7 +33,7 @@ const SignUpForm = () => {
     }),
     onSubmit: async (values, { setSubmitting, resetForm }) => {
       try {
-        const response = await axios.post("/api/signup", {
+        const response = await axios.post("http://127.0.0.1:5555/api/signup", {
           username: values.username,
           password: values.password,
         });
