@@ -1,0 +1,16 @@
+.navbar {
+    width: 100%;
+    height: var(--height-header); /* Make sure the custom property is defined in your global styles */
+    background: blue;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Optional, for some depth */
+  }
+  
+  .link-container {
+    color: black;
+    margin: 0 20px;
+    text-align: right;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    height: 100%; /* Ensure the container takes full height */
+  }

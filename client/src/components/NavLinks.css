@@ -1,9 +1,9 @@
 .nav-link {
     text-decoration: none;
-    color: #000;
+    color: white;
     padding: 10px;
   }
   
   .nav-link:hover {
-    color: #007bff; /* Hover color */
+    color: darkblue; /* Hover color */
   }

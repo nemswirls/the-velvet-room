@@ -1,32 +1,23 @@
-import  {useContext} from 'react';
-import NavBar from "./NavBar";
+import { useContext } from 'react';
+import NavBar from './NavBar';
 import MobileNavBar from './MobileNavBar';
-import {WindowWidthContext} from "../context/windowSize";
-// import {UserContext} from '../context/userProvider';
+import { WindowWidthContext } from '../context/windowSize';
+
 import Headroom from 'react-headroom';
-import styled from 'styled-components';
-import Logo from './Logo';
-const StyledHeader = styled(Headroom)`
-padding: 0;
-margin: 0;
+import './Header.css'; // Import the CSS file
 
- .headroom {
-    display: flex;
-    justify-content: space-between;
-    background: white;
-    height: var(--height-header);
-  }
-`
 const Header = () => {
-    const {isMobile} = useContext(WindowWidthContext);
-    // const { user } = useContext(UserContext);
+  const { isMobile } = useContext(WindowWidthContext);
 
-    return (
-        <StyledHeader>
-            <Logo />
-            {isMobile ? <MobileNavBar /> : <NavBar />}
-        </StyledHeader>
-    );
+
+  return (
+    <Headroom>
+      <div className="headroom">
+        {/* <Logo /> */}
+        {isMobile ? <MobileNavBar /> : <NavBar />}
+      </div>
+    </Headroom>
+  );
 };
 
 export default Header;
