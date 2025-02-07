@@ -1,6 +1,6 @@
 
 import NavLinks from './NavLinks';
-import './NavBar.css'; // Import the CSS file for styling
+import './NavBar.css'; 
 
 function NavBar() {
   return (

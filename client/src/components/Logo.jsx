@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom'; // Import NavLink from react-router-dom
+import { NavLink } from 'react-router-dom'; 
 
 function Logo() {
   const logoContainerStyle = {
@@ -14,12 +14,12 @@ function Logo() {
   };
 
   const navLinkStyle = {
-    textDecoration: 'none', // Remove default underline
+    textDecoration: 'none', 
   };
 
   return (
     <div style={logoContainerStyle}>
-      <NavLink to="/" exact style={navLinkStyle}>
+      <NavLink to="/" style={navLinkStyle}>
         <img src="images/velvet_room_logo.png" alt="home" style={logoImageStyle} />
       </NavLink>
     </div>

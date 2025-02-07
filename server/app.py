@@ -19,11 +19,11 @@ import random
 def index():
     return app.send_static_file('index.html')
 
-@app.before_request
-def check_if_logged_in():
-    openaccess= ["signup", "login", "check-session"]
-    if not session.get('player_id') and not request.endpoint in openaccess:
-        return {'error': 'Unauthorized, please log in first'}, 401
+# @app.before_request
+# def check_if_logged_in():
+#     openaccess= ["signup", "login", "check-session"]
+#     if not session.get('player_id') and not request.endpoint in openaccess:
+#         return {'error': 'Unauthorized, please log in first'}, 401
 
 class ClearSession(Resource):
     def delete(self):
@@ -498,7 +498,7 @@ api.add_resource(Wildcards, '/api/wildcards', endpoint='wildcards')
 api.add_resource(Compendiums, '/api/compendiums', endpoint='compendiums')
 api.add_resource(BuyPersonaById, '/api/buy-persona/<int:persona_id>', endpoint='buy_persona')
 api.add_resource(ReleasePersonaById, '/api/release-persona/<int:persona_id>', endpoint='release_persona')
-api.add_resource(FusePersonasById, '/api/fuse-personas/<int:persona_1_id>/<int:persona_2_id>', endpoint='fuse-personas')
+api.add_resource(FusePersonasById, '/api/fuse-personas/<int:persona_1_id>/<int:persona_2_id>', endpoint='fuse_personas')
 api.add_resource(UpdatePlayerProfile, '/api/update-player-profile', endpoint='update_player_profile')
 api.add_resource(Stocks, '/api/stocks', endpoint='stocks')
 
