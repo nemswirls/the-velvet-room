@@ -3,6 +3,6 @@
     margin: 0;
     display: flex;
     justify-content: space-between;
-    background: white;
+    background: blue;
     height: var(--height-header);
   }

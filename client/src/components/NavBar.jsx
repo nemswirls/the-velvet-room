@@ -6,6 +6,7 @@ function NavBar() {
   return (
     <nav className="navbar">
       <div className="link-container">
+        
         <NavLinks />
       </div>
     </nav>

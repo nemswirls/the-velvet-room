@@ -2,7 +2,7 @@ import { useContext } from 'react';
 import NavBar from './NavBar';
 import MobileNavBar from './MobileNavBar';
 import { WindowWidthContext } from '../context/windowSize';
-
+import Logo from './Logo';
 import Headroom from 'react-headroom';
 import './Header.css'; // Import the CSS file
 
@@ -13,7 +13,7 @@ const Header = () => {
   return (
     <Headroom>
       <div className="headroom">
-        {/* <Logo /> */}
+        <Logo />
         {isMobile ? <MobileNavBar /> : <NavBar />}
       </div>
     </Headroom>

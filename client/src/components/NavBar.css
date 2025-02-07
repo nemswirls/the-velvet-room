@@ -1,16 +1,20 @@
 .navbar {
-    width: 100%;
-    height: var(--height-header); /* Make sure the custom property is defined in your global styles */
-    background: blue;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Optional, for some depth */
-  }
+  display: flex;
+  justify-content: flex-start; /* Align items to the left */
+  align-items: center; 
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  background-color: blue; /* Example background color */
+}
   
   .link-container {
     color: black;
-    margin: 0 20px;
+    margin: 0 30px;
     text-align: right;
     display: flex;
     justify-content: flex-end;
     align-items: center;
     height: 100%; /* Ensure the container takes full height */
+    width: 100%
   }
