@@ -176,6 +176,9 @@ class SummonPersona(Resource):
              # Special case: First summon while player is level 1
             if player.level == 1:
                 eligible_personas = Persona.query.filter_by(level=1).all()
+            elif player.level >=92:
+                  # After level 92, allow random summons between level 50 and 90
+                  eligible_personas = Persona.query.filter(Persona.level.between(50, 90)).all()
             else:
                 # Regular summons, allow level range based on player level
                 min_level = max(1, player.level - 3)
@@ -400,10 +403,6 @@ class FusePersonasById(Resource):
             fused_persona = random.choice(resulting_persona)
             if not fused_persona:
                 return {'error': 'Fusion result persona not found'}, 404
-
-            # # Check if the player's level is sufficient for the fusion
-            # if player.level < resulting_persona.level:
-            #     return {'error': f'You need to be level {resulting_persona.level} to fuse this persona.'}, 400
 
             # Remove the fused persona materials from stock
             Stock.query.filter(Stock.player_id == player_id, Stock.persona_id == persona_1.id).delete()
