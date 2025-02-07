@@ -2,7 +2,7 @@ import  {useContext} from 'react';
 import NavBar from "./NavBar";
 import MobileNavBar from './MobileNavBar';
 import {WindowWidthContext} from "../context/windowSize";
-import {UserContext} from '../context/userProvider';
+// import {UserContext} from '../context/userProvider';
 import Headroom from 'react-headroom';
 import styled from 'styled-components';
 import Logo from './Logo';
@@ -19,7 +19,7 @@ margin: 0;
 `
 const Header = () => {
     const {isMobile} = useContext(WindowWidthContext);
-    const { user } = useContext(UserContext);
+    // const { user } = useContext(UserContext);
 
     return (
         <StyledHeader>
