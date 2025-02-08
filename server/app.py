@@ -399,7 +399,9 @@ class FusePersonasById(Resource):
             if not fusion_result:
                 return {'error': 'These personas cannot be fused together.'}, 400
             fused_arcana_id= Arcana.query.filter_by(name=fusion_result).first().id
-            resulting_persona = Persona.query.filter(Persona.arcana_id==fused_arcana_id, Persona.level<player.level + 3, Persona.level>player.level -3).all()
+            fusion_min = 50 if player.level > 92 else player.level - 3
+            fusion_max = 88 if player.level > 92 else player.level + 3
+            resulting_persona = Persona.query.filter(Persona.arcana_id==fused_arcana_id, Persona.level.between(fusion_min,fusion_max)).all()
             fused_persona = random.choice(resulting_persona)
             if not fused_persona:
                 return {'error': 'Fusion result persona not found'}, 404
@@ -486,21 +488,21 @@ class Stocks(Resource):
          # Return all personas in the compendium
             return make_response([stock_entry.persona.to_dict(only=("name", "level", "arcana.name")) for stock_entry in stock_entries], 200)
 
-api.add_resource(ClearSession, '/api/clear', endpoint='clear')
-api.add_resource(Signup, '/api/signup', endpoint='signup')
-api.add_resource(CheckSession, '/api/check-session', endpoint='check_session')
-api.add_resource(Login, '/api/login', endpoint='login')
-api.add_resource(Logout, '/api/logout', endpoint='logout')
-api.add_resource(ChooseWildcard, '/api/choose-wildcard/<int:wildcard_id>', endpoint='choose_wildcard')
-api.add_resource(PersonaByID, '/api/personas/<int:persona_id>', endpoint='persona_by_id')
-api.add_resource(SummonPersona, '/api/summon-persona', endpoint='summon_persona')
-api.add_resource(Wildcards, '/api/wildcards', endpoint='wildcards')
-api.add_resource(Compendiums, '/api/compendiums', endpoint='compendiums')
-api.add_resource(BuyPersonaById, '/api/buy-persona/<int:persona_id>', endpoint='buy_persona')
-api.add_resource(ReleasePersonaById, '/api/release-persona/<int:persona_id>', endpoint='release_persona')
-api.add_resource(FusePersonasById, '/api/fuse-personas/<int:persona_1_id>/<int:persona_2_id>', endpoint='fuse_personas')
-api.add_resource(UpdatePlayerProfile, '/api/update-player-profile', endpoint='update_player_profile')
-api.add_resource(Stocks, '/api/stocks', endpoint='stocks')
+api.add_resource(ClearSession, '/clear', endpoint='clear')
+api.add_resource(Signup, '/signup', endpoint='signup')
+api.add_resource(CheckSession, '/check-session', endpoint='check_session')
+api.add_resource(Login, '/login', endpoint='login')
+api.add_resource(Logout, '/logout', endpoint='logout')
+api.add_resource(ChooseWildcard, '/choose-wildcard/<int:wildcard_id>', endpoint='choose_wildcard')
+api.add_resource(PersonaByID, '/personas/<int:persona_id>', endpoint='persona_by_id')
+api.add_resource(SummonPersona, '/summon-persona', endpoint='summon_persona')
+api.add_resource(Wildcards, '/wildcards', endpoint='wildcards')
+api.add_resource(Compendiums, '/compendiums', endpoint='compendiums')
+api.add_resource(BuyPersonaById, '/buy-persona/<int:persona_id>', endpoint='buy_persona')
+api.add_resource(ReleasePersonaById, '/release-persona/<int:persona_id>', endpoint='release_persona')
+api.add_resource(FusePersonasById, '/fuse-personas/<int:persona_1_id>/<int:persona_2_id>', endpoint='fuse_personas')
+api.add_resource(UpdatePlayerProfile, '/update-player-profile', endpoint='update_player_profile')
+api.add_resource(Stocks, '/stocks', endpoint='stocks')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)

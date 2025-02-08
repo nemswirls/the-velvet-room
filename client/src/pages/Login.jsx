@@ -12,7 +12,7 @@ const Login = () => {
   
     return (
       <div className="login">
-        <h1>Welcome to The Velvet Room</h1>
+        {/* <h1>Welcome to The Velvet Room</h1> */}
         {showSignUp ? (
           <div className="form-container">
             <h2>Sign Up</h2>

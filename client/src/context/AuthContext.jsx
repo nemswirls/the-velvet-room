@@ -2,7 +2,7 @@ import  { createContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../api';
 
-export const AuthContext = createContext();
+ export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
