@@ -53,22 +53,23 @@ class Signup(Resource):
             db.session.add(player)
             db.session.commit()
             session['player_id'] = player.id  # Store player ID in the session
-            # After creating the player, return a message saying they can now choose a wildcard
-            # return {'message': 'Player created successfully, now choose your wildcard.'}, 201
             return make_response(player.to_dict(), 201)
         except Exception as e:
             db.session.rollback()
             return {'error': f'An error occurred: {str(e)}'}, 500
 class CheckSession(Resource):
-
     def get(self):
-        
-        player_id = session.get('player_id', 0)
+        player_id = session.get('player_id')
+
         if player_id:
+            # Check if player exists in the database
             player = Player.query.filter(Player.id == player_id).first()
-            return player.to_dict(only=("username","wildcard","personas","level", "yen", "stock_limit",)), 200
+            if player:
+                # If player is found, return player data
+                return player.to_dict(only=("username", "wildcard", "personas", "level", "yen", "stock_limit")), 200
         
-        return {}, 204
+        # Return an error if player_id is not in session or player doesn't exist
+        return {'error': 'Unauthorized, please log in first'}, 401
 
 class Login(Resource):
     def post(self):
@@ -233,7 +234,7 @@ class SummonPersona(Resource):
 class Wildcards(Resource):
     def get(self):
         try:
-            json = request.get_json()
+            
             player_id = session.get('player_id')
             if not player_id:
              return {'error': 'Unauthorized, please log in first'}, 401
@@ -247,7 +248,7 @@ class Wildcards(Resource):
             
             # Return the wildcards
             return {
-                'wildcards': [wc.to_dict(only=("name", "image",)) for wc in wildcards]
+                'wildcards': [wc.to_dict(only=("name", "image","persona_id")) for wc in wildcards]
             }, 200
         
         except Exception as e:

@@ -13,12 +13,17 @@ export const AuthProvider = ({ children }) => {
         // Example: Check if user is already logged in
         api.get('/check_session')
             .then(response => {
-                setUser(response.data.user);
+                if (response.status === 200 && response.data) {
+                    setUser(response.data); // Assuming response contains user data
+                } else {
+                    setUser(null); // No valid user, they are not logged in
+                }
                 setLoading(false);
             })
-            .catch(() => {
+            .catch(error => {
+                console.error('Error checking session:', error);
                 setLoading(false);
-                setUser(null);
+                setUser(null); // If there was an error, the user is not logged in
             });
     }, []);
 

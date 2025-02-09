@@ -6,6 +6,7 @@ import * as Yup from 'yup';
 import { api } from '../api';
 
 const SignUpForm = () => {
+
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
@@ -29,21 +30,21 @@ const SignUpForm = () => {
   
     try {
       const response = await api.post('/signup', values);
-  
-      if (!response.ok) {
-        throw new Error(response.data.error || 'Signup failed');
+      
+      if (response.status !== 201) {
+        throw new Error(response.data?.error || 'Signup failed');
       }
   
       setSuccess(true);
-      setTimeout(() => navigate('/choose-wildcard'), 1000);
+      console.log('Redirecting to wildcard selection...');
+      navigate('/choose-wildcard');
     } catch (error) {
       console.error('Signup failed', error);
-      setError(error.response?.data?.error || error.message);
+      setError(error.response?.data?.error || error.message); // Log the error message
     } finally {
       setSubmitting(false);
     }
   };
-
   return (
     <Container>
       <Formik
