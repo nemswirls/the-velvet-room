@@ -1,13 +1,13 @@
 
-import NavLinks from './NavLinks';
-import './NavBar.css'; 
+// import NavLinks from './NavLinks';
+
 
 function NavBar() {
   return (
     <nav className="navbar">
       <div className="link-container">
         
-        <NavLinks />
+      
       </div>
     </nav>
   );

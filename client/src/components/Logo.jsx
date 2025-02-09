@@ -1,29 +1,17 @@
-import { NavLink } from 'react-router-dom'; 
 
-function Logo() {
-  const logoContainerStyle = {
-    textAlign: 'left',
-    height: '100%',
-    display: 'flex',
-    alignItems: 'center',
-    marginLeft: '20px',
-  };
+import styled from 'styled-components';
 
-  const logoImageStyle = {
-    height: 'clamp(2rem, 6vw, 4rem)',
-  };
+const LogoContainer = styled.div`
+  display: flex;
 
-  const navLinkStyle = {
-    textDecoration: 'none', 
-  };
+`;
 
+const Logo = () => {
   return (
-    <div style={logoContainerStyle}>
-      <NavLink to="/" style={navLinkStyle}>
-        <img src="images/velvet_room_logo.png" alt="home" style={logoImageStyle} />
-      </NavLink>
-    </div>
+    <LogoContainer>
+      <img src="/images/velvet_room_logo.png" alt="Velvet Room Logo" style={{ height: '80px', marginRight: '10px' }} />
+    </LogoContainer>
   );
-}
+};
 
 export default Logo;

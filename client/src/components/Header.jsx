@@ -1,19 +1,24 @@
 import NavBar from './NavBar';
 import Logo from './Logo';
-import Headroom from 'react-headroom';
-import './Header.css'; 
+import ProfileDropdown from './ProfileDropdown';
+import styled from 'styled-components';
 
+const HeaderContainer = styled.header`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #151da6;
+`;
 const Header = () => {
   
 
-
-  return (
-    <Headroom>
-      <div className="headroom">
-        <Logo />
-         <NavBar />
-      </div>
-    </Headroom>
+return(
+<HeaderContainer>
+      <Logo /> {/* Left-aligned logo */}
+      <NavBar /> {/* Centered navbar with links */}
+      <ProfileDropdown /> {/* Right-aligned profile dropdown */}
+    </HeaderContainer>
   );
 };
 

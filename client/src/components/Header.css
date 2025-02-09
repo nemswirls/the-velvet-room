@@ -1,8 +1,0 @@
-.headroom {
-    padding: 0;
-    margin: 0;
-    display: flex;
-    justify-content: space-between;
-    background: blue;
-    height: var(--height-header);
-  }
