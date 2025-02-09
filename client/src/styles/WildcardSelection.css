@@ -14,11 +14,13 @@
     cursor: pointer;
     width: 200px; 
     transition: background-color 0.3s ease, transform 0.3s ease;
+    
   }
   
   .confirm-button:hover {
     background-color: #243c84; 
     transform: scale(1.05); /* Slightly grow on hover */
+    text-decoration: none;
   }
   .page-container {
     background-color: #151da6; 

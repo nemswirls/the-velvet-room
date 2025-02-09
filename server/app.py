@@ -454,6 +454,13 @@ class UpdatePlayerProfile(Resource):
             player = Player.query.get(player_id)
             if not player:
                 return {'error': 'Player not found'}, 404
+            
+             # Validate inputs
+            if 'username' in json and not json['username']:
+                return {'error': 'Username cannot be empty'}, 400
+            if 'password' in json and len(json['password']) < 8:
+                return {'error': 'Password must be at least 8 characters'}, 400
+
 
             # Update only fields that are provided in the request
             if 'password' in json:
@@ -463,7 +470,7 @@ class UpdatePlayerProfile(Resource):
 
             db.session.commit()
 
-            return player.to_dict(only=("username", "_password_hash")), 200
+            return player.to_dict(only=("username",)), 200
 
         except Exception as e:
             db.session.rollback()

@@ -15,9 +15,9 @@ const Header = () => {
 
 return(
 <HeaderContainer>
-      <Logo /> {/* Left-aligned logo */}
-      <NavBar /> {/* Centered navbar with links */}
-      <ProfileDropdown /> {/* Right-aligned profile dropdown */}
+      <Logo /> 
+      <NavBar /> 
+      <ProfileDropdown /> 
     </HeaderContainer>
   );
 };

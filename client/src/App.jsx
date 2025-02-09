@@ -11,7 +11,6 @@ import WildcardSelection from './pages/WildcardSelection';
 import UpdatePlayerProfile from './pages/UpdatePlayerProfile';
 import Footer from './components/Footer';
 import Header from './components/Header';
-
 function App() {
   return (
     <Router>
@@ -39,12 +38,12 @@ function AppRoutes() {
         <Route path="/choose-wildcard" element={<WildcardSelection />} />
         
         {/* Protected routes */}
-        <Route path="/" element={<ProtectedRoute component={Home} />} />
-        <Route path="/stock" element={<ProtectedRoute component={Stock} />} />
-        <Route path="/fusion" element={<ProtectedRoute component={Fusion} />} />
-        <Route path="/summon" element={<ProtectedRoute component={Summon} />} />
-        <Route path="/compendium" element={<ProtectedRoute component={Compendium} />} />
-        <Route path="/update-profile" element={<ProtectedRoute component={UpdatePlayerProfile} />} />
+        <Route path="/" element={<ProtectedRoute element={<Home />} />} />
+        <Route path="/stock" element={<ProtectedRoute element={<Stock />} />} />
+        <Route path="/fusion" element={<ProtectedRoute element={<Fusion />} />} />
+        <Route path="/summon" element={<ProtectedRoute element={<Summon />} />} />
+        <Route path="/compendium" element={<ProtectedRoute element={<Compendium />} />} />
+        <Route path="/update-profile" element={<ProtectedRoute element={<UpdatePlayerProfile />} />} />
       </Routes>
 
       {/* Conditionally render Footer */}

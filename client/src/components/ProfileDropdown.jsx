@@ -1,6 +1,7 @@
 import  { useState } from 'react';
 import styled from 'styled-components';
 import { useAuth } from '../context/AuthContext'; 
+import { Link } from 'react-router-dom';
 
 const ProfileContainer = styled.div`
   position: relative;
@@ -33,8 +34,14 @@ const DropdownItem = styled.div`
   cursor: pointer;
   &:hover {
     background-color: #6d9ac7;
-  }
+  
 `;
+const StyledLink = styled(Link)`
+  color: white; 
+  text-decoration: none; 
+  display: block; 
+  `
+;
 
 const ProfileDropdown = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -56,7 +63,9 @@ const ProfileDropdown = () => {
         onClick={toggleDropdown}
       />
       <DropdownMenu $Open={isDropdownOpen}>
+      <StyledLink to="/update-profile">
         <DropdownItem>Update Profile</DropdownItem>
+        </StyledLink>
         <DropdownItem onClick={logout}>Logout</DropdownItem>
       </DropdownMenu>
     </ProfileContainer>

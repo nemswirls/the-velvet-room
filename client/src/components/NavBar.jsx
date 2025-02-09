@@ -1,16 +1,29 @@
+import { Link } from 'react-router-dom';
+import styled from 'styled-components';
 
-// import NavLinks from './NavLinks';
+const NavBarContainer = styled.div`
+  display: flex;
+  align-items: center;
+`;
 
+const StyledLink = styled(Link)`
+  text-decoration: none;
+  color: white;
+  font-size: 20px;
+  margin: 0 20px;
+  &:hover {
+    color: #6d9ac7;
+  }
+`;
 
-function NavBar() {
+const NavBar = () => {
   return (
-    <nav className="navbar">
-      <div className="link-container">
-        
-      
-      </div>
-    </nav>
+    <NavBarContainer>
+      <StyledLink to="/stock">Stock</StyledLink>
+      <StyledLink to="/summon">Summon</StyledLink>
+      <StyledLink to="/fusion">Fusion</StyledLink>
+      <StyledLink to="/compendium">Compendium</StyledLink>
+    </NavBarContainer>
   );
-}
-
+};
 export default NavBar;
