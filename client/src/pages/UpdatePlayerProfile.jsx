@@ -5,28 +5,28 @@ import {api} from '../api'
 import { useNavigate } from'react-router-dom';
 
 const Container = styled.div`
-  display: flex;
-  flex-direction: column;
+display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px;
   height: 100vh;
-  background-color:  #15155b;
+  background: url('/images/lavenza.png') no-repeat right center;
+  background-size: contain;
+  background-color: #6d9ac7;
   
-  .text{
-  color: white;
-  font-size: 30px;
-
 `;
-
+const FormContainer = styled.div`
+  background-color: #ffffff;
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 1;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+`;
 const Form = styled.form`
   display: flex;
   flex-direction: column;
-  width: 300px;
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 `;
 
 const Input = styled.input`
@@ -102,6 +102,7 @@ useEffect(() => {
   }
   return (
     <Container>
+     <FormContainer>
       <h2 className='text'>Update Profile</h2>
       {error && <p style={{ color: 'red' }}>{error}</p>}
       <Form onSubmit={handleSubmit}>
@@ -119,6 +120,7 @@ useEffect(() => {
         />
         <Button type="submit">Update</Button>
       </Form>
+      </FormContainer>
     </Container>
   );
 };
