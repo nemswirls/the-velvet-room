@@ -248,7 +248,7 @@ class Wildcards(Resource):
             
             # Return the wildcards
             return {
-                'wildcards': [wc.to_dict(only=("name", "image","persona_id")) for wc in wildcards]
+                'wildcards': [wc.to_dict(only=("name", "image","id", "persona_id")) for wc in wildcards]
             }, 200
         
         except Exception as e:

@@ -13,7 +13,6 @@ function WildcardSelection() {
     const fetchWildcards = async () => {
       try {
         const response = await api.get('/wildcards');
-        console.log('Wildcards fetched:', response.data); // Log the response data
         setWildcards(response.data.wildcards);
       } catch (error) {
         console.error('Failed to fetch wildcards', error);
@@ -24,6 +23,7 @@ function WildcardSelection() {
 
   const handleConfirm = async () => {
     if (selectedWildcard) {
+      
       try {
         const response = await api.post(`/choose-wildcard/${selectedWildcard.id}`);
         if (response.status === 200) {
