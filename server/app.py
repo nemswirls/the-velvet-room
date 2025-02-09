@@ -331,39 +331,37 @@ class BuyPersonaById(Resource):
 class ReleasePersonaById(Resource):
     def delete(self, persona_id):
         try:
-            json = request.get_json()
+            # Check if the player is logged in
             player_id = session.get('player_id')
             if not player_id:
                 return {'error': 'Unauthorized, please log in first'}, 401
 
-            # Fetch the player and their stock of personas
+            # Fetch the player
             player = Player.query.get(player_id)
             if not player:
                 return {'error': 'Player not found'}, 404
 
-            
+            # Fetch the stock entry for the persona
             stock_entry = Stock.query.filter_by(player_id=player_id, persona_id=persona_id).first()
-
             if not stock_entry:
                 return {'error': 'Persona not found in your stock'}, 404
 
-            # Get the persona's level to calculate yen reward
+            # Fetch the persona data
             persona = Persona.query.get(persona_id)
             if not persona:
                 return {'error': 'Persona not found'}, 404
 
             # Calculate yen reward based on persona's level
-            yen_reward = persona.level * 50  # For example, 50 yen per level of the persona
+            yen_reward = persona.level * 50
 
-            # Remove the persona from the player's stock
+            # Update player's yen and delete the stock entry in one transaction
+            player.yen += yen_reward
+            db.session.commit()
             db.session.delete(stock_entry)
             db.session.commit()
 
-            # Add yen reward to player
-            player.yen += yen_reward
-            db.session.commit()
-
             return {'message': f'Persona released, earned {yen_reward} yen.'}, 200
+
         except Exception as e:
             db.session.rollback()
             return {'error': f'An error occurred: {str(e)}'}, 500
@@ -477,7 +475,7 @@ class UpdatePlayerProfile(Resource):
             return {'error': f'An error occurred: {str(e)}'}, 500
 class Stocks(Resource):
     def get(self):
-            json = request.get_json()
+            
             player_id = session.get('player_id')
             if not player_id:
                 return {'error': 'Unauthorized, please log in first'}, 401
@@ -493,8 +491,8 @@ class Stocks(Resource):
             if not stock_entries:
                 return {'error': 'No stock entries found for this player'}, 404
 
-         # Return all personas in the compendium
-            return make_response([stock_entry.persona.to_dict(only=("name", "level", "arcana.name")) for stock_entry in stock_entries], 200)
+         
+            return make_response([stock_entry.persona.to_dict(only=("name", "level", "arcana.name", "image", "id")) for stock_entry in stock_entries], 200)
 
 api.add_resource(ClearSession, '/clear', endpoint='clear')
 api.add_resource(Signup, '/signup', endpoint='signup')

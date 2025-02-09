@@ -4,6 +4,7 @@ import ProfileDropdown from './ProfileDropdown';
 import styled from 'styled-components';
 import { useAuth } from '../context/AuthContext'
 
+
 const HeaderContainer = styled.header`
 display: flex;
   align-items: center;
@@ -37,6 +38,7 @@ const InfoBox = styled.div`
 `;
 const Header = () => {
   const { user } = useAuth();
+  
   const playerLevel = user?.level ?? 1;
   const playerYen = user?.yen ?? 0;
 
