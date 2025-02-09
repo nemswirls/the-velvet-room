@@ -9,12 +9,15 @@ import Summon from './pages/Summon';
 import Compendium from './pages/Compendium';
 import WildcardSelection from './pages/WildcardSelection';
 import UpdatePlayerProfile from './pages/UpdatePlayerProfile';
+import Footer from './components/Footer';
+import Header from './components/Header';
 
 
 function App() {
   return (
   <Router>
       <AuthProvider>
+        <Header />
         <Routes>
           {/*Public routes*/}
           <Route path="/login" element={<Login />} />
@@ -27,6 +30,7 @@ function App() {
           <Route path="/compendium" element={<ProtectedRoute component={Compendium}/>} />
           <Route path="/update-profile" element={<ProtectedRoute component={UpdatePlayerProfile}/>} />
         </Routes>
+        <Footer />
       </AuthProvider>
     </Router>
   );

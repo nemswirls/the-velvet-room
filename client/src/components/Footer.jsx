@@ -5,9 +5,10 @@ const StyledFooter = styled.footer`
     flex-direction: column;
     position: relative;
     align-items: center;
-
-
-
+    background-color: #151da6;
+    color: white;
+    
+   
 `
 const Footer = () => {
 return(
