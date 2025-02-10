@@ -377,7 +377,7 @@ class ReleasePersonaById(Resource):
 class FusePersonasById(Resource):
     def post(self, persona_1_id, persona_2_id):
         try:
-            json = request.get_json()
+            
             player_id = session.get('player_id')
             if not player_id:
                 return {'error': 'Unauthorized, please log in first'}, 401

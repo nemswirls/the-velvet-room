@@ -35,7 +35,9 @@ const CompendiumWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: 	#272e7d
+  background-color: 	#243c84;
+  overflow-y: auto; /* Enable vertical scrolling */
+    max-height: 80vh; 
 `;
 
 const CompendiumRow = styled.div`
