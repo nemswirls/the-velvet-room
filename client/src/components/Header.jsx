@@ -2,8 +2,8 @@ import NavBar from './NavBar';
 import Logo from './Logo';
 import ProfileDropdown from './ProfileDropdown';
 import styled from 'styled-components';
-import { useAuth } from '../context/AuthContext'
 
+import { usePlayer } from '../context/PlayerContext';
 
 const HeaderContainer = styled.header`
 display: flex;
@@ -37,10 +37,9 @@ const InfoBox = styled.div`
   text-align: center;
 `;
 const Header = () => {
-  const { user } = useAuth();
+ 
   
-  const playerLevel = user?.level ?? 1;
-  const playerYen = user?.yen ?? 0;
+  const { playerLevel, playerYen } = usePlayer();
 
 return(
 <HeaderContainer>

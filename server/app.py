@@ -174,7 +174,7 @@ class SummonPersona(Resource):
             if player.yen < 200:
                 return {'error': 'Not enough yen.'}, 400
 
-             # Special case: First summon while player is level 1
+            # Special case: First summon while player is level 1
             if player.level == 1:
                 eligible_personas = Persona.query.filter_by(level=1).all()
             elif player.level >=92:
@@ -185,8 +185,10 @@ class SummonPersona(Resource):
                 min_level = max(1, player.level - 3)
                 max_level = player.level + 3
                 eligible_personas = Persona.query.filter(Persona.level >= min_level, Persona.level <= max_level).all()
+
             if not eligible_personas:
                 return {'error': 'No personas available for your level range.'}, 404
+
             # Exclude personas that are already in the player's stock
             stock_personas = [stock.persona_id for stock in player.stocks]
             eligible_personas = [persona for persona in eligible_personas if persona.id not in stock_personas]
@@ -198,13 +200,9 @@ class SummonPersona(Resource):
             if not available_personas:
                 return {'error': 'All available personas have already been summoned or added to your compendium.'}, 400
 
+            # Randomly select a persona from available personas
+            selected_persona = random.choice(available_personas)
 
-            # If no eligible personas are left after filtering out those in stock
-            if not eligible_personas:
-                return {'error': 'You already have all available personas in your stock.'}, 400
-            # Randomly select a persona from eligible personas
-            selected_persona = random.choice(eligible_personas)
-            print(type(selected_persona))
             # Deduct yen from player
             player.yen -= 200
             db.session.commit()
@@ -213,32 +211,32 @@ class SummonPersona(Resource):
             new_stock = Stock(player_id=player_id, persona_id=selected_persona.id)
             db.session.add(new_stock)
             db.session.commit()
-            
-            # Debugging: Check if persona already exists in the compendium
+
+            # Check if persona already exists in the compendium
             existing_entry = Compendium.query.filter_by(persona_id=selected_persona.id).first()
-            print(f"Compendium entry for persona {selected_persona.id} exists: {existing_entry}")
 
             if not existing_entry:
                 # Persona not in the compendium, add it
                 new_compendium_entry = Compendium(player_id=player.id, persona_id=selected_persona.id, in_stock=True)
                 db.session.add(new_compendium_entry)
-                print(f"Added new entry to Compendium for Persona ID: {selected_persona.id}")
 
             db.session.commit()
-            # Increment player level by 1 and give yen for leveling up
-            player.level += 1
-            player.yen += 100  # 100 yen per level up
-            db.session.commit()
-            
+
+            # Increment player level by 1 and give yen for leveling up (even if player is at max level)
+            if player.level < 99:  # Prevent incrementing level beyond max
+                player.level += 1
+                player.yen += 100  # 100 yen per level up
+                db.session.commit()
+
             # Update stock limit based on the new level
             player.update_stock_limit()
             db.session.commit()
+
             return make_response(selected_persona.to_dict(only=("name", "level", "arcana.name", "image")), 201)
-            
+
         except Exception as e:
             db.session.rollback()  # Rollback on error
             return {'error': f'An error occurred: {str(e)}'}, 500
-
 class Wildcards(Resource):
     def get(self):
         try:
@@ -377,7 +375,6 @@ class ReleasePersonaById(Resource):
 class FusePersonasById(Resource):
     def post(self, persona_1_id, persona_2_id):
         try:
-            
             player_id = session.get('player_id')
             if not player_id:
                 return {'error': 'Unauthorized, please log in first'}, 401
@@ -396,22 +393,36 @@ class FusePersonasById(Resource):
             if not any(stock.persona_id == persona_1.id for stock in player.stocks) or \
                not any(stock.persona_id == persona_2.id for stock in player.stocks):
                 return {'error': 'You must have both personas in your stock to fuse them.'}, 400
-            
+
             # Get the arcana names
             arcana_1_name = persona_1.arcana.name
             arcana_2_name = persona_2.arcana.name
             # Get fusion result from the arcana mapping
-            fusion_result = arcana_map.get(arcana_1_name,{}).get(arcana_2_name)
+            fusion_result = arcana_map.get(arcana_1_name, {}).get(arcana_2_name)
 
             if not fusion_result:
                 return {'error': 'These personas cannot be fused together.'}, 400
-            fused_arcana_id= Arcana.query.filter_by(name=fusion_result).first().id
+
+            fused_arcana_id = Arcana.query.filter_by(name=fusion_result).first().id
             fusion_min = 50 if player.level > 92 else player.level - 3
             fusion_max = 88 if player.level > 92 else player.level + 3
-            resulting_persona = Persona.query.filter(Persona.arcana_id==fused_arcana_id, Persona.level.between(fusion_min,fusion_max)).all()
-            fused_persona = random.choice(resulting_persona)
-            if not fused_persona:
+            resulting_persona = Persona.query.filter(
+                Persona.arcana_id == fused_arcana_id,
+                Persona.level.between(fusion_min, fusion_max)
+            ).all()
+
+            if not resulting_persona:
                 return {'error': 'Fusion result persona not found'}, 404
+
+            # Exclude personas that are already in the compendium
+            compendium_personas = {entry.persona_id for entry in Compendium.query.filter_by(player_id=player_id).all()}
+            resulting_persona = [p for p in resulting_persona if p.id not in compendium_personas]
+
+            if not resulting_persona:
+                return {'error': 'No available fusion result personas that are not in your compendium.'}, 400
+
+            # Randomly select a persona from the resulting fusion
+            fused_persona = random.choice(resulting_persona)
 
             # Remove the fused persona materials from stock
             Stock.query.filter(Stock.player_id == player_id, Stock.persona_id == persona_1.id).delete()
@@ -422,25 +433,25 @@ class FusePersonasById(Resource):
             db.session.add(new_stock)
             db.session.commit()
 
-            # Debugging: Check if persona already exists in the compendium
+            # Check if persona already exists in the compendium
             existing_entry = Compendium.query.filter_by(persona_id=fused_persona.id).first()
-            print(f"Compendium entry for persona {fused_persona.id} exists: {existing_entry}")
 
             if not existing_entry:
                 # Persona not in the compendium, add it
                 new_compendium_entry = Compendium(player_id=player.id, persona_id=fused_persona.id, in_stock=True)
                 db.session.add(new_compendium_entry)
-                print(f"Added new entry to Compendium for Persona ID: {fused_persona.id}")
 
-                db.session.commit()
-            # Level up the player and give yen based on level increase
-            level_up_amount = 5  
-            player.level += level_up_amount
-            player.yen += level_up_amount * 100  # 100 yen per level up
             db.session.commit()
+
+            # Level up the player and give yen based on level increase
+            level_up_amount = 5  # Set the level-up amount for fusion
+            if player.level < 99:
+                player.level += level_up_amount
+                player.yen += level_up_amount * 100  # 100 yen per level up
+                db.session.commit()
+
             # Update stock limit based on the new level
             player.update_stock_limit()
-
             db.session.commit()
 
             return make_response(fused_persona.to_dict(only=("name", "arcana.name", "level", "image")), 201)
