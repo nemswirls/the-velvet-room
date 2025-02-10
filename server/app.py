@@ -264,7 +264,7 @@ class Wildcards(Resource):
 
 class Compendiums(Resource):
     def get(self):
-            json = request.get_json()
+            
             player_id = session.get('player_id')
             if not player_id:
                 return {'error': 'Unauthorized, please log in first'}, 401
@@ -281,11 +281,11 @@ class Compendiums(Resource):
                 return {'error': 'No compendium entries found for this player'}, 404
 
          # Return all personas in the compendium
-            return make_response([compendium_entry.persona.to_dict(only=("name", "level", "calculated_price", "arcana.name")) for compendium_entry in compendium_entries], 200)
+            return make_response([compendium_entry.persona.to_dict(only=("id","name", "level", "calculated_price", "arcana.name", "arcana.id")) for compendium_entry in compendium_entries], 200)
 class BuyPersonaById(Resource):
     def post(self, persona_id):
         try:
-            json = request.get_json()
+           
 
             # Ensure the player is logged in
             
