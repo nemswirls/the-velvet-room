@@ -11,7 +11,7 @@ display: flex;
   height: 100vh;
   background: url('/images/lavenza.png') no-repeat right center;
   background-size: contain;
-  background-color: #6d9ac7;
+  background-color: #243c84;
   
 `;
 const FormContainer = styled.div`
