@@ -11,6 +11,13 @@ const StockWrapper = styled.div`
   padding: 20px;
   background-color: #243c84;
 `;
+const BackgroundImageContainer = styled.div`
+  background-image: url('/images/marie.png');
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  height: 500px;  /* Adjust the height based on how much of the image you want to show */
+`;
 
 const Stock = () => {
   const [personas, setPersonas] = useState([]);
@@ -67,6 +74,7 @@ const Stock = () => {
         </div>
         <StockImage persona={selectedPersona} />
       </div>
+      <BackgroundImageContainer />
     </StockWrapper>
   );
 };
