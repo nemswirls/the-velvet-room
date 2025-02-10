@@ -13,6 +13,8 @@ const StockRowWrapper = styled.div`
   cursor: pointer;
   &:hover {
     background-color: #6d9ac7;
+  
+    
   }
 `;
 

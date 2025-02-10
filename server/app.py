@@ -191,6 +191,14 @@ class SummonPersona(Resource):
             stock_personas = [stock.persona_id for stock in player.stocks]
             eligible_personas = [persona for persona in eligible_personas if persona.id not in stock_personas]
 
+            # Exclude personas already in the compendium
+            compendium_personas = {entry.persona_id for entry in Compendium.query.filter_by(player_id=player_id).all()}
+            available_personas = [p for p in eligible_personas if p.id not in stock_personas and p.id not in compendium_personas]
+
+            if not available_personas:
+                return {'error': 'All available personas have already been summoned or added to your compendium.'}, 400
+
+
             # If no eligible personas are left after filtering out those in stock
             if not eligible_personas:
                 return {'error': 'You already have all available personas in your stock.'}, 400
