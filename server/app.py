@@ -178,8 +178,8 @@ class SummonPersona(Resource):
             if player.level == 1:
                 eligible_personas = Persona.query.filter_by(level=1).all()
             elif player.level >=92:
-                  # After level 92, allow random summons between level 50 and 90
-                  eligible_personas = Persona.query.filter(Persona.level.between(50, 90)).all()
+                  # After level 92, allow random summons between level 1 and 88
+                  eligible_personas = Persona.query.filter(Persona.level.between(1, 88)).all()
             else:
                 # Regular summons, allow level range based on player level
                 min_level = max(1, player.level - 3)
@@ -443,7 +443,7 @@ class FusePersonasById(Resource):
 
             db.session.commit()
 
-            return make_response(fused_persona.to_dict(only=("name", "arcana.name", "level" )), 201)
+            return make_response(fused_persona.to_dict(only=("name", "arcana.name", "level", "image")), 201)
 
         except Exception as e:
             db.session.rollback()
@@ -502,6 +502,63 @@ class Stocks(Resource):
          
             return make_response([stock_entry.persona.to_dict(only=("name", "level", "arcana.name", "image", "id")) for stock_entry in stock_entries], 200)
 
+class FusedPersonaPreview(Resource):
+    def get(self, persona_1_id, persona_2_id):
+        try:
+            player_id = session.get('player_id')
+            if not player_id:
+                return {'error': 'Unauthorized, please log in first'}, 401
+
+            player = Player.query.get(player_id)
+            if not player:
+                return {'error': 'Player not found'}, 404
+
+            persona_1 = Persona.query.get(persona_1_id)
+            persona_2 = Persona.query.get(persona_2_id)
+
+            if not persona_1 or not persona_2:
+                return {'error': 'Invalid persona(s) selected'}, 400
+
+            # Ensure player has both personas in their stock
+            if not any(stock.persona_id == persona_1.id for stock in player.stocks) or \
+               not any(stock.persona_id == persona_2.id for stock in player.stocks):
+                return {'error': 'You must have both personas in your stock to preview fusion.'}, 400
+
+            # Get the arcana names
+            arcana_1_name = persona_1.arcana.name
+            arcana_2_name = persona_2.arcana.name
+
+            # Get fusion result from the arcana mapping
+            fusion_result = arcana_map.get(arcana_1_name, {}).get(arcana_2_name)
+
+            if not fusion_result:
+                return {'error': 'These personas cannot be fused together.'}, 400
+
+            fused_arcana_id = Arcana.query.filter_by(name=fusion_result).first().id
+            fusion_min = 50 if player.level > 92 else player.level - 3
+            fusion_max = 88 if player.level > 92 else player.level + 3
+
+            resulting_persona = Persona.query.filter(
+                Persona.arcana_id == fused_arcana_id,
+                Persona.level.between(fusion_min, fusion_max)
+            ).all()
+
+                
+            if not resulting_persona:
+                return {'error': 'Fusion result persona not found'}, 404
+
+            fused_persona = random.choice(resulting_persona)
+
+            existing_entry = Compendium.query.filter_by(player_id=player_id, persona_id=fused_persona.id).first()
+            if existing_entry:
+                return {'error': f'{fused_persona.name} is already in your compendium.'}, 400
+
+
+            return fused_persona.to_dict(only=("name", "arcana.name", "level", "image"))
+
+        except Exception as e:
+            return {'error': f'An error occurred: {str(e)}'}, 500
+
 api.add_resource(ClearSession, '/clear', endpoint='clear')
 api.add_resource(Signup, '/signup', endpoint='signup')
 api.add_resource(CheckSession, '/check-session', endpoint='check_session')
@@ -517,6 +574,7 @@ api.add_resource(ReleasePersonaById, '/release-persona/<int:persona_id>', endpoi
 api.add_resource(FusePersonasById, '/fuse-personas/<int:persona_1_id>/<int:persona_2_id>', endpoint='fuse_personas')
 api.add_resource(UpdatePlayerProfile, '/update-player-profile', endpoint='update_player_profile')
 api.add_resource(Stocks, '/stocks', endpoint='stocks')
+api.add_resource(FusedPersonaPreview, '/preview-fusion/<int:persona_1_id>/<int:persona_2_id>', endpoint='preview_fusion')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)

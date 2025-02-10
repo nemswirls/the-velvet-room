@@ -14,7 +14,7 @@ const StockContainer = ({ personas, onClick, onRelease }) => {
   return (
     <Container>
       {personas.map((persona) => (
-        <StockRow key={persona.id} persona={persona} onClick={onClick} onRelease={onRelease} />
+        <StockRow key={persona.id} persona={persona} onClick={onClick} onRelease={onRelease}/>
       ))}
     </Container>
   );
