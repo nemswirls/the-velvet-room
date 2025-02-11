@@ -7,7 +7,7 @@ with app.app_context():
     print("Deleting all records...")
 
     # Clear all tables in order
-    # db.session.query(Special_Material).delete()
+    Special_Material.query.delete()
     Compendium.query.delete()
     Stock.query.delete()
     Wildcard.query.delete()
@@ -44,50 +44,15 @@ with app.app_context():
         for wildcard in wildcards
     ])
     db.session.commit()
-#     print("Creating stock...")
-#     db.session.add_all([
-#     Stock(
-#         player_id=1,  
-#         persona_id=persona.id
-#     )
-#     for persona in db.session.query(Persona).filter_by(in_pool=True).all()
-# ])
-#     db.session.commit()
-#     print("Stock creation complete!")
 
-#     print("Creating compendium...")
-
-# # Fetch personas in the pool and create compendium entries
-#     compendium_entries = [
-#     Compendium(player_id=1, persona_id=persona.id)
-#     for persona in db.session.query(Persona).filter_by(in_pool=True).all()
-# ]
-
-#     db.session.add_all(compendium_entries)
-#     db.session.commit()
-
-#     print("Compendium creation complete!")
-
-#     print("Creating players...")
-
-#     # Assume three wildcards already exist
-#     wildcards = db.session.query(Wildcard).all()
-#     if len(wildcards) < 3:
-#      raise ValueError("Not enough wildcards found. Please seed at least three wildcards.")
-
-# players = [
-#     Player(username="Player1", wildcard_id=wildcards[0].id, yen=20000, level=1),
-#     Player(username="Player2", wildcard_id=wildcards[1].id, yen=20000, level=1),
-#     Player(username="Player3", wildcard_id=wildcards[2].id, yen=20000, level=1),
-# ]
-
-# for player in players:
-#     player.password_hash = "StrongPassword123!"
-
-# db.session.add_all(players)
-# db.session.commit()
-
-# print("Player creation complete!")
-
+    # print("Creating special_materials...")
+    # db.session.add_all([
+    #     Special_Material(
+    #         wildcard_id=Wildcard.query.filter_by(name=material["wildcard_id"]).first().id,
+    #         special_fusion_id=Persona.query.filter_by(name=material["special_fusion_id"]).first().id,
+    #         material_id=Persona.query.filter_by(name=material["material_id"]).first().id
+    #     )
+    #     for material in wildcards
+    # ])
 
     print("Seeding complete!")

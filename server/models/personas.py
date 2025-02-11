@@ -20,8 +20,10 @@ class Persona(db.Model, SerializerMixin):
     wildcard = db.relationship("Wildcard", back_populates="initial_persona", uselist=False, lazy="select")
     stocks = db.relationship("Stock", back_populates="persona", lazy="select")
     compendiums = db.relationship("Compendium", back_populates="persona", lazy="select")
+    special_fusions = db.relationship("Special_Material", foreign_keys="[Special_Material.special_fusion_id]", back_populates="special_fusion_persona")
+    materials = db.relationship("Special_Material", foreign_keys="[Special_Material.material_id]", back_populates="material_persona")
      # Serialization rules
-    serialize_rules = ('-arcana.personas', '-wildcard.initial_persona', '-compendiums.persona', '-stocks.persona', )
+    serialize_rules = ('-arcana.personas', '-wildcard.initial_persona', '-compendiums.persona', '-stocks.persona', "-special_fusions.special_fusion_persona", "-materials.material_persona" )
 
     __table_args__ = (
         CheckConstraint('level >= 1', name='level_greater_than_zero'),

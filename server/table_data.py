@@ -25,9 +25,9 @@ arcanas = [
 ]
 
 wildcards = [
-    {"id": 1, "name": "Makoto Yuki", "image": "makoto_yuki_wildcard.png", "initial_persona_id": "Orpheus"},
-    {"id": 2, "name": "Yu Narukami", "image": "yu_narukami_wildcard.png", "initial_persona_id": "Izanagi"},
-    {"id": 3, "name": "Ren Amamiya", "image": "ren_amamiya_wildcard.png", "initial_persona_id": "Arsène"}
+    {"id": 1, "name": "Makoto Yuki", "image": "makoto_yuki_wildcard.png", "initial_persona_id": "Orpheus", "special_fusions": [{"special_fusion_id":198, "material_id":[136,154,155,193,173],},{"special_fusion_id":199, "material_id":[134,135,136,137,138],},{"special_fusion_id":200, "material_id":[1,199],}, ] },
+    {"id": 2, "name": "Yu Narukami", "image": "yu_narukami_wildcard.png", "initial_persona_id": "Izanagi", "special_fusions": [{"special_fusion_id":198, "material_id":[136,154,155,193,173],},{"special_fusion_id":201, "material_id":[175,95,50,52,113],},{"special_fusion_id":202, "material_id":[2,201],}, ] },
+    {"id": 3, "name": "Ren Amamiya", "image": "ren_amamiya_wildcard.png", "initial_persona_id": "Arsène", "special_fusions": [{"special_fusion_id":198, "material_id":[136,154,155,193,173],},{"special_fusion_id":203, "material_id":[5,20,192,151,193],},{"special_fusion_id":204, "material_id":[3,203],}, ] },
 ]
 
 personas = [ 

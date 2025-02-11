@@ -16,7 +16,7 @@ const BackgroundImageContainer = styled.div`
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
-  height: 500px;  /* Adjust the height based on how much of the image you want to show */
+  height: 600px;  /* Adjust the height based on how much of the image you want to show */
 `;
 
 const Stock = () => {

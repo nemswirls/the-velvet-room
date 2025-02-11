@@ -15,7 +15,8 @@ class Wildcard(db.Model, SerializerMixin):
     
     initial_persona = db.relationship("Persona", back_populates="wildcard", lazy="select")
     players = db.relationship("Player", back_populates="wildcard", lazy="select")
-    serialize_rules = ('-players.wildcard','-initial_persona.wildcard',)
+    special_materials = db.relationship("Special_Material", back_populates="wildcard")
+    serialize_rules = ('-players.wildcard','-initial_persona.wildcard', "-special_materials.wildcard",)
     def __repr__(self):
         
        def __repr__(self):
