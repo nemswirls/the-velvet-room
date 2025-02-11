@@ -15,18 +15,13 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         // Try to load the user from localStorage on app load
-        const savedUser = localStorage.getItem('user');
-        if (savedUser) {
-            setUser(JSON.parse(savedUser)); // Restore user session
-            setLoading(false);
-        } else {
-            // If no user data in localStorage, check session via API
+        setLoading(true)
             api.get('/check_session')
                 .then(response => {
                     if (response.status === 200 && response.data) {
                         setUser(response.data); // Set user from API
-                        // Optionally store it in localStorage
-                        localStorage.setItem('user', JSON.stringify(response.data));
+                      
+                        
                     } else {
                         setUser(null); // No valid session
                     }
@@ -39,7 +34,7 @@ export const AuthProvider = ({ children }) => {
                     setError('Failed to check session');
                 });
         }
-    }, []);
+     ,[]);
 
     const login = async (username, password) => {
         setLoading(true);  // Show loading during login
@@ -70,7 +65,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, logout, loading, error }}>
+        <AuthContext.Provider value={{ user, login, logout, loading, error, setUser }}>
             {children}
         </AuthContext.Provider>
     );

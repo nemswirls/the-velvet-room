@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import StockContainer from '../components/StockContainer'; 
 import StockImage from '../components/StockImage';
 import '../styles/Stock.css';
-
+import { useAuth} from '../context/AuthContext';
 const StockWrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -23,6 +23,7 @@ const Stock = () => {
   const [personas, setPersonas] = useState([]);
   const [selectedPersona, setSelectedPersona] = useState(null);
   const [setError] = useState(null);
+  const { setUser} = useAuth()
 
   useEffect(() => {
     const fetchStocks = async () => {
@@ -52,8 +53,9 @@ const Stock = () => {
     }
 
     try {
-      await api.delete(`/release-persona/${personaId}`);
+     const response =  await api.delete(`/release-persona/${personaId}`);
       setPersonas((prevPersonas) => prevPersonas.filter((p) => p.id !== personaId));
+      setUser(response.data)
       alert('Persona released successfully!');
     } catch (error) {
       console.error('Error releasing persona:', error);

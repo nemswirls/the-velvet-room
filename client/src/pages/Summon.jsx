@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { api } from '../api';
 import styled from 'styled-components';
 import StockImage from '../components/StockImage';
-
+import { useAuth} from '../context/AuthContext';
 const SummonWrapper = styled.div`
   display: flex;
   justify-content: space-between;
@@ -55,15 +55,19 @@ const OpaqueSquare = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+}
 `;
+
 const Summon = () => {
 
  const [summonedPersona, setSummonedPersona] = useState(null);
+ const { setUser} = useAuth()
       
  const handleSummon = async () => {
     try {
       const response = await api.get('/summon-persona');
       setSummonedPersona(response.data);
+      setUser(response.data.player);
     } catch (error) {
       if (error.response && error.response.status === 400 && error.response.data.error === 'You have reached your stock limit.') {
         alert('You have reached your stock limit. Please release a persona or fuse to summon another.');

@@ -220,7 +220,7 @@ class SummonPersona(Resource):
                 new_compendium_entry = Compendium(player_id=player.id, persona_id=selected_persona.id, in_stock=True)
                 db.session.add(new_compendium_entry)
 
-            db.session.commit()
+                db.session.commit()
 
             # Increment player level by 1 and give yen for leveling up (even if player is at max level)
             if player.level < 99:  # Prevent incrementing level beyond max
@@ -233,8 +233,9 @@ class SummonPersona(Resource):
             # Update stock limit based on the new level
             player.update_stock_limit()
             db.session.commit()
-
-            return make_response(selected_persona.to_dict(only=("name", "level", "arcana.name", "image")), 201)
+            persona_dict = selected_persona.to_dict(only=("name", "level", "arcana.name", "image"))
+            persona_dict["player"] = player.to_dict(only=("username", "level", "personas", "stock_limit", "wildcard", "yen"))
+            return make_response(persona_dict, 201)
 
         except Exception as e:
             db.session.rollback()  # Rollback on error
@@ -329,8 +330,11 @@ class BuyPersonaById(Resource):
             db.session.commit()
 
             # Return success message with persona data
-            return {'message': 'Persona purchased and added to stock successfully', 
-                    'persona': persona.to_dict(only=("name", "arcana.name", "level"))}, 201
+            return make_response({
+            'message': 'Persona purchased and added to stock successfully',
+            'persona': persona.to_dict(only=("name", "arcana.name", "level")),
+            'player': player.to_dict(only=("username", "level", "stock_limit", "wildcard", "yen"))
+            }, 201)
 
         except Exception as e:
             db.session.rollback()
@@ -368,7 +372,7 @@ class ReleasePersonaById(Resource):
             db.session.delete(stock_entry)
             db.session.commit()
 
-            return {'message': f'Persona released, earned {yen_reward} yen.'}, 200
+            return make_response(player.to_dict(only=("username", "level", "personas", "stock_limit", "wildcard", "yen")), 201)
 
         except Exception as e:
             db.session.rollback()
@@ -446,7 +450,7 @@ class FusePersonasById(Resource):
                 new_compendium_entry = Compendium(player_id=player.id, persona_id=fused_persona.id, in_stock=True)
                 db.session.add(new_compendium_entry)
 
-            db.session.commit()
+                db.session.commit()
 
             # Level up the player and give yen based on level increase
             level_up_amount = 3  # Set the level-up amount for fusion
@@ -461,7 +465,10 @@ class FusePersonasById(Resource):
             player.update_stock_limit()
             db.session.commit()
 
-            return make_response(fused_persona.to_dict(only=("name", "arcana.name", "level", "image", "id")), 201)
+            return make_response({        
+            'persona': fused_persona.to_dict(only=("name", "arcana.name", "level")),
+            'player': player.to_dict(only=("username", "level", "stock_limit", "wildcard", "yen"))
+            }, 201)
 
         except Exception as e:
             db.session.rollback()
@@ -580,7 +587,7 @@ class FusedPersonaPreview(Resource):
 
 api.add_resource(ClearSession, '/clear', endpoint='clear')
 api.add_resource(Signup, '/signup', endpoint='signup')
-api.add_resource(CheckSession, '/check-session', endpoint='check_session')
+api.add_resource(CheckSession, '/check_session', endpoint='check_session')
 api.add_resource(Login, '/login', endpoint='login')
 api.add_resource(Logout, '/logout', endpoint='logout')
 api.add_resource(ChooseWildcard, '/choose-wildcard/<int:wildcard_id>', endpoint='choose_wildcard')

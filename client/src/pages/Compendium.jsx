@@ -6,7 +6,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import ArcanaFilter from '../components/ArcanaFilter';
 import SortBy from '../components/SortBy';
-
+import { useAuth} from '../context/AuthContext';
 const PageWrapper = styled.div`
   display: flex;
   padding: 20px;
@@ -74,7 +74,7 @@ const Compendium = () => {
   const [filteredPersonas, setFilteredPersonas] = useState([]);
   const [ arcanaFilter,setArcanaFilter] = useState('');
   const [ sortBy,setSortBy] = useState('');
-
+  const { setUser} = useAuth()
   useEffect(() => {
     const fetchCompendium = async () => {
       try {
@@ -116,22 +116,24 @@ const Compendium = () => {
   
       // Make API call to attempt the purchase of the persona
       api.post(`/buy-persona/${personaId}`)
-        .then((response) => {
-          if (response.data && response.data.message) {
-            alert(`Persona purchased successfully! ${response.data.message}`);
-          } else {
-            alert('An error occurred while purchasing the persona.');
-          }
-        })
-        .catch((error) => {
-          console.error('Error purchasing persona:', error);
-          if (error.response && error.response.data) {
-            // Provide detailed error message from the response if available
-            alert(`Failed to purchase persona. ${error.response.data.error || 'Unknown error'}`);
-          } else {
-            alert('Failed to purchase persona. You may have reached the stock limit.');
-          }
-        });
+      .then((response) => {
+        if (response.data && response.data.message) {
+          alert(`Persona purchased successfully! ${response.data.message}`);
+        } else {
+          alert('An error occurred while purchasing the persona.');
+        }
+        // Set user state only after a successful response
+        setUser(response.data.player);
+      })
+      .catch((error) => {
+        console.error('Error purchasing persona:', error);
+        if (error.response && error.response.data) {
+          // Provide detailed error message from the response if available
+          alert(`Failed to purchase persona. ${error.response.data.error || 'Unknown error'}`);
+        } else {
+          alert('Failed to purchase persona. You may have reached the stock limit.');
+        }
+      });
     }
   };
 

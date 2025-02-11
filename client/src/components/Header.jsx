@@ -2,8 +2,8 @@ import NavBar from './NavBar';
 import Logo from './Logo';
 import ProfileDropdown from './ProfileDropdown';
 import styled from 'styled-components';
-
-import { usePlayer } from '../context/PlayerContext';
+import { Suspense } from 'react';
+import { useAuth } from '../context/AuthContext';
 
 const HeaderContainer = styled.header`
 display: flex;
@@ -38,10 +38,11 @@ const InfoBox = styled.div`
 `;
 const Header = () => {
  
-  
-  const { playerLevel, playerYen } = usePlayer();
+  const { user}= useAuth()
+
 
 return(
+  <Suspense fallback={<div>loading</div>}>
 <HeaderContainer>
 <LogoContainer>
         <Logo />
@@ -51,14 +52,15 @@ return(
       </NavbarContainer>
       <PlayerInfoContainer>
         <InfoBox>
-         <h4>Level:{playerLevel}</h4>
+         {user && <h4>Level:{user.level}</h4>}
         </InfoBox>
         <InfoBox>
-          <h4>¥ {playerYen}</h4>
+          {user && <h4>¥ {user.yen}</h4>}
         </InfoBox>
       </PlayerInfoContainer>
       <ProfileDropdown /> 
     </HeaderContainer>
+    </Suspense>
   );
 };
 

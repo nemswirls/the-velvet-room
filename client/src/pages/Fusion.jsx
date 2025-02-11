@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { api } from '../api';
 import styled from 'styled-components';
-
+import { useAuth} from '../context/AuthContext';
 const Container = styled.div`
   display: flex;
   justify-content: space-between;
@@ -99,7 +99,7 @@ const Fusion = () => {
   const [selectedPersonas, setSelectedPersonas] = useState([]);
   const [fusionResult, setFusionResult] = useState(null);
   const [personas, setPersonas] = useState([]);
-
+  const { setUser} = useAuth()
   // Fetch the player's stock
   const fetchStocks = async () => {
     try {
@@ -147,6 +147,7 @@ const Fusion = () => {
         console.log('Fusion finalized:', response.data);
         setSelectedPersonas([]);
         setFusionResult(null);
+        setUser(response.data.player)
         fetchStocks();
       } catch (error) {
         console.error('Error finalizing fusion:', error.response || error);

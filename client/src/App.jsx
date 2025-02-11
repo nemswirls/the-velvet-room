@@ -1,5 +1,5 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
+import {  Routes, Route, useLocation } from 'react-router-dom';
+
 
 import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
@@ -14,13 +14,9 @@ import Footer from './components/Footer';
 import Header from './components/Header';
 function App() {
   return (
-    <Router>
-      <AuthProvider>
-      
+    <>
           <AppRoutes />
-        
-      </AuthProvider>
-    </Router>
+    </>
   );
 }
 
