@@ -177,14 +177,14 @@ class SummonPersona(Resource):
             # Special case: First summon while player is level 1
             if player.level == 1:
                 eligible_personas = Persona.query.filter_by(level=1).all()
-            elif player.level >=92:
+            elif player.level >=88:
                   # After level 92, allow random summons between level 1 and 88
-                  eligible_personas = Persona.query.filter(Persona.level.between(1, 88)).all()
+                  eligible_personas = Persona.query.filter(Persona.level.between(1, 88), Persona.in_pool == True).all()
             else:
                 # Regular summons, allow level range based on player level
                 min_level = max(1, player.level - 3)
                 max_level = player.level + 3
-                eligible_personas = Persona.query.filter(Persona.level >= min_level, Persona.level <= max_level).all()
+                eligible_personas = Persona.query.filter(Persona.level >= min_level, Persona.level <= max_level, Persona.in_pool==True).all()
 
             if not eligible_personas:
                 return {'error': 'No personas available for your level range.'}, 404
@@ -225,6 +225,8 @@ class SummonPersona(Resource):
             # Increment player level by 1 and give yen for leveling up (even if player is at max level)
             if player.level < 99:  # Prevent incrementing level beyond max
                 player.level += 1
+            else:
+                player.level = 99
                 player.yen += 100  # 100 yen per level up
                 db.session.commit()
 
@@ -393,10 +395,11 @@ class FusePersonasById(Resource):
             if not any(stock.persona_id == persona_1.id for stock in player.stocks) or \
                not any(stock.persona_id == persona_2.id for stock in player.stocks):
                 return {'error': 'You must have both personas in your stock to fuse them.'}, 400
-
+            
             # Get the arcana names
             arcana_1_name = persona_1.arcana.name
             arcana_2_name = persona_2.arcana.name
+
             # Get fusion result from the arcana mapping
             fusion_result = arcana_map.get(arcana_1_name, {}).get(arcana_2_name)
 
@@ -404,25 +407,27 @@ class FusePersonasById(Resource):
                 return {'error': 'These personas cannot be fused together.'}, 400
 
             fused_arcana_id = Arcana.query.filter_by(name=fusion_result).first().id
-            fusion_min = 50 if player.level > 92 else player.level - 3
-            fusion_max = 88 if player.level > 92 else player.level + 3
-            resulting_persona = Persona.query.filter(
-                Persona.arcana_id == fused_arcana_id,
-                Persona.level.between(fusion_min, fusion_max)
-            ).all()
+            fusion_min = 50 if player.level > 88 else player.level - 3
+            fusion_max = 88 if player.level > 88 else player.level + 3
 
-            if not resulting_persona:
+            # Fetch all matching personas (as a list)
+            resulting_personas = Persona.query.filter(
+                Persona.arcana_id == fused_arcana_id,
+                Persona.level.between(fusion_min, fusion_max), Persona.in_pool == True
+            ).all()  # Returns a list of Persona objects
+
+            if not resulting_personas:
                 return {'error': 'Fusion result persona not found'}, 404
 
             # Exclude personas that are already in the compendium
             compendium_personas = {entry.persona_id for entry in Compendium.query.filter_by(player_id=player_id).all()}
-            resulting_persona = [p for p in resulting_persona if p.id not in compendium_personas]
+            resulting_personas = [p for p in resulting_personas if p.id not in compendium_personas]
 
-            if not resulting_persona:
+            if not resulting_personas:
                 return {'error': 'No available fusion result personas that are not in your compendium.'}, 400
 
-            # Randomly select a persona from the resulting fusion
-            fused_persona = random.choice(resulting_persona)
+            # Pick a random persona from the list
+            fused_persona = random.choice(resulting_personas)
 
             # Remove the fused persona materials from stock
             Stock.query.filter(Stock.player_id == player_id, Stock.persona_id == persona_1.id).delete()
@@ -444,8 +449,10 @@ class FusePersonasById(Resource):
             db.session.commit()
 
             # Level up the player and give yen based on level increase
-            level_up_amount = 5  # Set the level-up amount for fusion
-            if player.level < 99:
+            level_up_amount = 3  # Set the level-up amount for fusion
+            if player.level + level_up_amount > 99:
+                player.level = 99  # Cap the level at 99
+            else:
                 player.level += level_up_amount
                 player.yen += level_up_amount * 100  # 100 yen per level up
                 db.session.commit()
@@ -454,7 +461,7 @@ class FusePersonasById(Resource):
             player.update_stock_limit()
             db.session.commit()
 
-            return make_response(fused_persona.to_dict(only=("name", "arcana.name", "level", "image")), 201)
+            return make_response(fused_persona.to_dict(only=("name", "arcana.name", "level", "image", "id")), 201)
 
         except Exception as e:
             db.session.rollback()
@@ -549,23 +556,24 @@ class FusedPersonaPreview(Resource):
             fusion_min = 50 if player.level > 92 else player.level - 3
             fusion_max = 88 if player.level > 92 else player.level + 3
 
-            resulting_persona = Persona.query.filter(
+            # Fetch all matching personas (as a list)
+            resulting_personas = Persona.query.filter(
                 Persona.arcana_id == fused_arcana_id,
-                Persona.level.between(fusion_min, fusion_max)
-            ).all()
+                Persona.level.between(fusion_min, fusion_max), Persona.in_pool == True
+            ).all()  # Returns a list of Persona objects
 
-                
-            if not resulting_persona:
+            if not resulting_personas:
                 return {'error': 'Fusion result persona not found'}, 404
 
-            fused_persona = random.choice(resulting_persona)
+            # Pick a random persona from the list
+            fused_persona = random.choice(resulting_personas)
 
+            # Check if persona is already in compendium
             existing_entry = Compendium.query.filter_by(player_id=player_id, persona_id=fused_persona.id).first()
             if existing_entry:
                 return {'error': f'{fused_persona.name} is already in your compendium.'}, 400
 
-
-            return fused_persona.to_dict(only=("name", "arcana.name", "level", "image"))
+            return fused_persona.to_dict(only=("name", "arcana.name", "level", "image", "id"))
 
         except Exception as e:
             return {'error': f'An error occurred: {str(e)}'}, 500

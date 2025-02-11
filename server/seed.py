@@ -7,7 +7,7 @@ with app.app_context():
     print("Deleting all records...")
 
     # Clear all tables in order
-    Special_Material.query.delete()
+    # Special_Material.query.delete()
     Compendium.query.delete()
     Stock.query.delete()
     Wildcard.query.delete()
