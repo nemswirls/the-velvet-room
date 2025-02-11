@@ -20,7 +20,8 @@ arcanas = [
     {"id": 19, "name": "Moon"},
     {"id": 20, "name": "Sun"},
     {"id": 21, "name": "Judgement"},
-    {"id": 22, "name": "Aeon"}
+    {"id": 22, "name": "Aeon"},
+    {"id": 23, "name": "World"}
 ]
 
 wildcards = [
@@ -226,8 +227,15 @@ personas = [
     {"id": 194, "name": "Nidhoggr", "arcana": "Aeon", "level": 47, "image": "persona194.png", "in_pool": True, "special": False},
     {"id": 195, "name": "Uriel", "arcana": "Aeon", "level": 57, "image": "persona195.png", "in_pool": True, "special": False},
     {"id": 196, "name": "Ananta", "arcana": "Aeon", "level": 73, "image": "persona196.png", "in_pool": True, "special": False},
-    {"id": 197, "name": "Metatron", "arcana": "Aeon", "level": 87, "image": "persona197.png", "in_pool": True, "special": False}
-    ]
+    {"id": 197, "name": "Metatron", "arcana": "Aeon", "level": 87, "image": "persona197.png", "in_pool": True, "special": False},
+    {"id": 198, "name": "Lucifer", "arcana": "Judgement", "level": 89, "image": "persona198.png", "in_pool": False, "special": True},
+    {"id": 199, "name": "Thanatos", "arcana": "Death", "level": 80, "image": "persona199.png", "in_pool": False, "special": True},
+    {"id": 200, "name": "Messiah", "arcana": "Judgement", "level": 91, "image": "persona200.png", "in_pool": False, "special": True},
+    {"id": 201, "name": "Magatsu-Izanagi", "arcana": "Tower", "level": 80, "image": "persona201.png", "in_pool": False, "special": True},
+    {"id": 202, "name": "Izanagi-no-Okami", "arcana": "World", "level": 91, "image": "persona202.png", "in_pool": False, "special": True},
+    {"id": 203, "name": "Satanael", "arcana": "Fool", "level": 80, "image": "persona203.png", "in_pool": False, "special": True},
+    {"id": 204, "name": "Raoul", "arcana": "Fool", "level": 91, "image": "persona204.png", "in_pool": False, "special": True},
+  ]
 
         
 
