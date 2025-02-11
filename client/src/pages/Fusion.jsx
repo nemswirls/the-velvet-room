@@ -54,8 +54,8 @@ const PersonaItem = styled.div`
 
 const FusionPreview = styled.div`
   margin-top: 20px;
-  width: 200px;
-  height: 200px;
+  width: 300px;
+  height: 300px;
   background-color: rgba(0, 0, 0, 0.1);
   display: flex;
   justify-content: center;
@@ -79,12 +79,20 @@ const FusionButton = styled.button`
 
   &:hover {
     background-color: #1269cc;
+    text-decoration: none;
   }
 
   &:disabled {
     background-color: #ccc;
     cursor: not-allowed;
   }
+`;
+const PersonaName = styled.p`
+ position: absolute;
+  margin-top: 8px; 
+  font-size: 16px;
+  font-weight: bold; 
+  color: #fff; 
 `;
 
 const Fusion = () => {
@@ -181,9 +189,10 @@ const Fusion = () => {
         {fusionResult && (
           <FusionPreview>
             <FusionImage
-              src={`/images/personas/${fusionResult.image}`}
+              src={`/images/personas/${fusionResult.image}`} 
               alt={fusionResult.name}
-            />
+                />
+                <PersonaName>{fusionResult.name}</PersonaName>
           </FusionPreview>
         )}
 
