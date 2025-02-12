@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { api } from '../api';
 import styled from 'styled-components';
 import { useAuth} from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom'; 
 const Container = styled.div`
   display: flex;
   justify-content: space-between;
@@ -94,12 +95,42 @@ const PersonaName = styled.p`
   font-weight: bold; 
   color: #fff; 
 `;
+const SpecialFusionButton = styled.button`
+  margin-top: 30px;
+  padding: 20px;
+  background: linear-gradient(180deg, #d92323, #1269cc , #ffe52c);
+  color: white;
+  border: none;
+  border-radius: 50%; 
+  cursor: pointer;
+  font-size: 25px;
+  width: 200px; 
+  height: 200px; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background-color 0.3s ease;
+  box-shadow: 0px 0px 10px rgba(243, 243, 243, 0.5);
+
+  &:hover {
+    background-color: #6d9ac7; 
+    text-decoration: none;
+  }
+
+`;
+const SpecialFusionButtonContainer = styled.div`
+  display: flex;
+  justify-content: center; 
+  align-items: center;     
+  height: 50vh;           
+`;
 
 const Fusion = () => {
   const [selectedPersonas, setSelectedPersonas] = useState([]);
   const [fusionResult, setFusionResult] = useState(null);
   const [personas, setPersonas] = useState([]);
-  const { setUser} = useAuth()
+  const { user, setUser} = useAuth()
+  const navigate = useNavigate();
   // Fetch the player's stock
   const fetchStocks = async () => {
     try {
@@ -155,6 +186,28 @@ const Fusion = () => {
     }
   };
 
+  // Handle redirect to special fusion page based on wildcard
+  const handleRedirectToSpecialFusions = () => {
+    if (user && user.wildcard) {
+      const wildcardName = user.wildcard.name;
+      switch (wildcardName) {
+        case 'Makoto Yuki':
+          navigate('/special-fusions/makoto');
+          break;
+        case 'Yu Narukami':
+          navigate('/special-fusions/yu');
+          break;
+        case 'Ren Amamiya':
+          navigate('/special-fusions/ren');
+          break;
+        default:
+          alert('Unknown wildcard');
+          break;
+      }
+    } else {
+      alert('No wildcard selected');
+    }
+  };
   return (
     <Container>
       <LeftSide>
@@ -204,7 +257,15 @@ const Fusion = () => {
         >
           Fuse Personas
         </FusionButton>
+
+           {/* Button to go to Special Fusions page based on the wildcard */}
+           <SpecialFusionButtonContainer>
+           <SpecialFusionButton onClick={handleRedirectToSpecialFusions}>
+          Go to Special Fusions
+        </SpecialFusionButton>
+        </SpecialFusionButtonContainer>
       </LeftSide>
+      
 
       <RightSide>
         <img

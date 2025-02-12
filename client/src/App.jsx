@@ -1,6 +1,4 @@
 import {  Routes, Route, useLocation } from 'react-router-dom';
-
-
 import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
 import Login from './pages/Login';
@@ -12,6 +10,9 @@ import WildcardSelection from './pages/WildcardSelection';
 import UpdatePlayerProfile from './pages/UpdatePlayerProfile';
 import Footer from './components/Footer';
 import Header from './components/Header';
+import SpecialFusionMakoto from './pages/SpecialFusionMakoto';
+import SpecialFusionYu from './pages/SpecialFusionYu';
+import SpecialFusionRen from './pages/SpecialFusionRen';
 function App() {
   return (
     <>
@@ -43,6 +44,10 @@ function AppRoutes() {
         <Route path="/summon" element={<ProtectedRoute element={<Summon />} />} />
         <Route path="/compendium" element={<ProtectedRoute element={<Compendium />} />} />
         <Route path="/update-profile" element={<ProtectedRoute element={<UpdatePlayerProfile />} />} />
+
+        <Route path="/special-fusions/makoto" element={<ProtectedRoute element={<SpecialFusionMakoto />} />} />
+        <Route path="/special-fusions/yu" element={<ProtectedRoute element={<SpecialFusionYu />} />} />
+        <Route path="/special-fusions/ren" element={<ProtectedRoute element={<SpecialFusionRen />} />} />
       </Routes>
 
       {/* Conditionally render Footer */}

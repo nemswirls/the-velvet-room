@@ -11,6 +11,7 @@ from config import app, db, api
 # Add your model imports
 from models import Player, Arcana, Compendium, Persona, Stock, Wildcard, Special_Material
 from utilities import arcana_map 
+from table_data import specials_dict
 import random
 
 # Views go here!
@@ -602,6 +603,79 @@ class FusedPersonaPreview(Resource):
         except Exception as e:
             return {'error': f'An error occurred: {str(e)}'}, 500
 
+class SpecialFusion(Resource):
+    def post(self):
+        player_id = session.get('player_id')
+        if not player_id:
+            return {'error': 'Unauthorized, please log in first'}, 401
+        
+        player = Player.query.get(player_id)
+        if not player:
+            return {'error': 'Player not found'}, 404
+        
+        # Get the wildcard-specific fusion dictionary
+        fusion_dict = specials_dict.get(player.wildcard.name)
+        if not fusion_dict:
+            return {'error': 'This wildcard does not have any special fusions.'}, 404
+
+        fusion_requests = request.get_json()  # Expecting {'fusion': 'Lucifer'} for example
+
+        # Check if the special fusion exists for the player's wildcard
+        special_fusion = fusion_dict.get(fusion_requests.get("fusion"))
+        if not special_fusion:
+            return {'error': 'Invalid special fusion request.'}, 400
+        
+        # Check if player has all required materials for the fusion
+        missing_materials = []
+        for material in special_fusion:
+            # Check if the material exists in the Special_Material table
+            material_persona = Persona.query.filter_by(name=material).first()
+            if not material_persona:
+                return {'error': f'Persona {material} not found in database.'}, 404
+            
+            # Check if the player has the material in their stock
+            stock_entry = Stock.query.filter_by(player_id=player.id, persona_id=material_persona.id).first()
+            if not stock_entry:
+                missing_materials.append(material)
+
+            # Check if the material is registered in Special_Material for this fusion
+            special_material_entry = Special_Material.query.filter_by(
+                wildcard_id=player.wildcard.id,
+                special_fusion_id=fusion_persona.id,
+                material_id=material_persona.id
+            ).first()
+
+            if not special_material_entry:
+                missing_materials.append(material)
+
+        if missing_materials:
+            return {'error': f'Missing required materials: {", ".join(missing_materials)}'}, 400
+        
+        # Perform the fusion - Create the special fusion persona
+        fusion_persona = Persona.query.filter_by(name=fusion_requests["fusion"]).first()
+
+        if not fusion_persona:
+            return {'error': 'Fusion persona not found in database.'}, 404
+
+        # Add special fusion persona to stock
+        new_stock = Stock(player_id=player.id, persona_id=fusion_persona.id)
+        db.session.add(new_stock)
+
+        # Add the fusion persona to the compendium if it's not already there
+        existing_entry = Compendium.query.filter_by(player_id=player.id, persona_id=fusion_persona.id).first()
+        if not existing_entry:
+            new_compendium_entry = Compendium(player_id=player.id, persona_id=fusion_persona.id, in_stock=True)
+            db.session.add(new_compendium_entry)
+
+        # Commit changes to the database
+        db.session.commit()
+
+        return {'message': f'{fusion_requests["fusion"]} successfully fused and added to compendium!', 
+                'player': player.to_dict(only=("id", "username", "level", "yen", "stock_limit", 
+                                   "wildcard.id", "wildcard.name", "wildcard.image",
+                                   "personas.id", "personas.name", "personas.level", "personas.arcana.name"))}, 201
+    
+
 api.add_resource(ClearSession, '/clear', endpoint='clear')
 api.add_resource(Signup, '/signup', endpoint='signup')
 api.add_resource(CheckSession, '/check_session', endpoint='check_session')
@@ -618,6 +692,8 @@ api.add_resource(FusePersonasById, '/fuse-personas/<int:persona_1_id>/<int:perso
 api.add_resource(UpdatePlayerProfile, '/update-player-profile', endpoint='update_player_profile')
 api.add_resource(Stocks, '/stocks', endpoint='stocks')
 api.add_resource(FusedPersonaPreview, '/preview-fusion/<int:persona_1_id>/<int:persona_2_id>', endpoint='preview_fusion')
+api.add_resource(SpecialFusion, '/special-fusion', endpoint='special_fusion')
+
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
