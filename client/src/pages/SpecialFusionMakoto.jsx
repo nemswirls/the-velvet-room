@@ -1,11 +1,93 @@
 import { useState, useEffect } from 'react';
 import { api } from '../api';
-import SpecialFusionSection from '../components/SpecialFusionSection';
+import { useAuth } from '../context/AuthContext';
+import styled from 'styled-components';
+import '../styles/SpecialFusion.css';
 
+
+const SectionContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  background-color: #1269cc;
+`;
+
+const FusionSection = styled.div`
+  flex: 1;
+  margin-right: 10px;
+  position: relative;
+  height: 800px;
+  background-color: #6d9ac7;
+  border-radius: 10px;
+  padding: 20px;
+`;
+
+const FusionLeft = styled(FusionSection)`
+  background-image: url('/images/personas/persona198.png');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+`;
+
+const FusionMiddle = styled(FusionSection)`
+  background-image: url('/images/personas/persona199.png');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+`;
+
+const FusionRight = styled(FusionSection)`
+  background-image: url('/images/personas/persona200.png');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+`;
+
+const FusionTitle = styled.h3`
+  color: black;
+  font-weight: bold;
+`;
+
+const MaterialContainer = styled.div`
+  display: block; 
+  margin-top: 20px;
+`;
+
+const MaterialItem = styled.div`
+   padding: 10px;
+  background-color: #f1f1f1;
+  border: 1px solid #ccc;
+  color: black;
+  border-radius: 5px;
+  text-align: center;
+  opacity: 0.7;
+  margin-bottom: 10px; 
+`;
+
+const FusionButton = styled.button`
+  padding: 10px;
+  background-color: #1269cc;
+  color: white;
+  border: none;
+  border-radius: 10%;
+  cursor: pointer;
+  
+    
+  &:hover {
+    background-color: #51eefc;
+    text-decoration: none
+  }
+`;
+const SpecialFusionContainer = styled.div`
+  background-color: #1269cc;  
+  padding: 20px;
+
+`;
 const SpecialFusionMakoto = () => {
   const [specialFusions, setSpecialFusions] = useState([]);
   const [playerStock, setPlayerStock] = useState([]);
-  const [fusionMessage, setFusionMessage] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const { setUser } = useAuth();
 
   // Fetch player's stock
   const fetchPlayerStock = async () => {
@@ -27,39 +109,118 @@ const SpecialFusionMakoto = () => {
     }
   };
 
-  useEffect(() => {
-    fetchPlayerStock();
-    fetchSpecialFusions();
-  }, []);
-
+  // Handle fusion
   const handleFusion = async (fusionName) => {
     try {
       const response = await api.post('/special-fusion', { fusion: fusionName });
-      setFusionMessage(response.data.message);
-      fetchPlayerStock();
+      setUser(response.data.player); 
+      fetchPlayerStock(); 
+      alert(`Fusion successful! You created ${fusionName}. Your stock has been updated.`);
     } catch (error) {
       console.error('Error finalizing fusion:', error.response || error);
-      setFusionMessage(error.response?.data?.error || 'Fusion failed. Check if you have the required personas.');
+      alert(error.response?.data?.error || 'Fusion failed. Check if you have the required personas.');
     }
   };
 
+
+  // Check if material is in stock
+  const isInStock = (materialName) => {
+    return playerStock.some(item => item.name === materialName);
+  }; 
+
+  useEffect(() => {
+    fetchPlayerStock(); 
+    fetchSpecialFusions(); 
+  }, []);
+
+  useEffect(() => {
+    if (specialFusions.length > 0 && playerStock.length > 0) {
+      setLoading(false);
+    }
+  }, [specialFusions, playerStock]);
+
+  
+  const safeMaterials = (fusion) => {
+    return Array.isArray(fusion.materials) ? fusion.materials : [];
+  };
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+
   return (
     <div>
+      <SpecialFusionContainer>
       <h2>Makoto&apos;s Special Fusions</h2>
-      {fusionMessage && <p>{fusionMessage}</p>}
       {specialFusions.length === 0 ? (
         <p>No special fusions available.</p>
       ) : (
-        specialFusions.map((fusion) => (
-          <SpecialFusionSection
-            key={fusion.name}
-            fusion={fusion}
-            requiredMaterials={fusion.materials}
-            playerStock={playerStock}
-            onFuse={handleFusion}
-          />
-        ))
+        <SectionContainer>
+          {/* Left Section */}
+          <FusionLeft>
+            {specialFusions[0] && (
+              <>
+                <FusionTitle>{specialFusions[0].name}</FusionTitle>
+                <MaterialContainer>
+                  {safeMaterials(specialFusions[0]).map((material, index) => (
+                    <MaterialItem key={index}>{material.name} {isInStock(material)}
+                      {material}</MaterialItem>
+                  ))}
+                  <FusionButton
+                    onClick={() => handleFusion(specialFusions[0].name)}
+                   
+                  >Fuse
+                   
+                  </FusionButton>
+                </MaterialContainer>
+              </>
+            )}
+          </FusionLeft>
+
+          {/* Middle Section */}
+          <FusionMiddle>
+            {specialFusions[1] && (
+              <>
+                <FusionTitle>{specialFusions[1].name}</FusionTitle>
+                <MaterialContainer>
+                  {safeMaterials(specialFusions[1]).map((material, index) => (
+                    <MaterialItem key={index}>{material.name} {isInStock(material)}
+                      {material}</MaterialItem>
+                  ))}
+                  <FusionButton
+                    onClick={() => handleFusion(specialFusions[1].name)}
+                   
+                  >Fuse
+                   
+                  </FusionButton>
+                </MaterialContainer>
+              </>
+            )}
+          </FusionMiddle>
+
+          {/* Right Section */}
+          <FusionRight>
+            {specialFusions[2] && (
+              <>
+                <FusionTitle>{specialFusions[2].name}</FusionTitle>
+                <MaterialContainer>
+                  {safeMaterials(specialFusions[2]).map((material, index) => (
+                    <MaterialItem key={index}>{material.name} {isInStock(material)}
+                      {material}</MaterialItem>
+                  ))}
+                  <FusionButton
+                    onClick={() => handleFusion(specialFusions[2].name)}
+                   
+                  >Fuse
+                 
+                  </FusionButton>
+                </MaterialContainer>
+              </>
+            )}
+          </FusionRight>
+        </SectionContainer>
       )}
+      </SpecialFusionContainer>
     </div>
   );
 };

@@ -20,11 +20,11 @@ import random
 def index():
     return app.send_static_file('index.html')
 
-# @app.before_request
-# def check_if_logged_in():
-#     openaccess= ["signup", "login", "check-session"]
-#     if not session.get('player_id') and not request.endpoint in openaccess:
-#         return {'error': 'Unauthorized, please log in first'}, 401
+@app.before_request
+def check_if_logged_in():
+    openaccess= ["signup", "login", "check-session"]
+    if not session.get('player_id') and not request.endpoint in openaccess:
+        return {'error': 'Unauthorized, please log in first'}, 401
 
 class ClearSession(Resource):
     def delete(self):
@@ -618,64 +618,73 @@ class SpecialFusion(Resource):
         if not fusion_dict:
             return {'error': 'This wildcard does not have any special fusions.'}, 404
 
-        fusion_requests = request.get_json()  # Expecting {'fusion': 'Lucifer'} for example
+        fusion_requests = request.get_json()
 
-        # Check if the special fusion exists for the player's wildcard
-        special_fusion = fusion_dict.get(fusion_requests.get("fusion"))
-        if not special_fusion:
-            return {'error': 'Invalid special fusion request.'}, 400
+        # Ensure the request contains "fusion"
+        fusion_name = fusion_requests.get("fusion")
+        if not fusion_name:
+            return {'error': 'Fusion name is required.'}, 400
         
-        # Check if player has all required materials for the fusion
+        # Check if this is a valid special fusion for the wildcard
+        special_fusion_materials = fusion_dict.get(fusion_name)
+        if not special_fusion_materials:
+            return {'error': f'"{fusion_name}" is not a valid special fusion for this wildcard.'}, 400
+
+        # Get the fusion result persona
+        fusion_persona = Persona.query.filter_by(name=fusion_name).first()
+        if not fusion_persona:
+            return {'error': f'Fusion persona "{fusion_name}" not found in database.'}, 404
+
+        # Ensure the fusion result is special
+        if not fusion_persona.special:
+            return {'error': f'{fusion_name} is not a valid special fusion persona.'}, 400
+
+        # Check if the player has all required materials
         missing_materials = []
-        for material in special_fusion:
-            # Check if the material exists in the Special_Material table
-            material_persona = Persona.query.filter_by(name=material).first()
+        stock_entries_to_remove = []  
+
+        for material_name in special_fusion_materials:
+            # Check if the material exists in the Persona table
+            material_persona = Persona.query.filter_by(name=material_name).first()
             if not material_persona:
-                return {'error': f'Persona {material} not found in database.'}, 404
+                return {'error': f'Material persona "{material_name}" not found in database.'}, 404
             
-            # Check if the player has the material in their stock
+            # Check if the player has the material in stock
             stock_entry = Stock.query.filter_by(player_id=player.id, persona_id=material_persona.id).first()
             if not stock_entry:
-                missing_materials.append(material)
-                print(f"Missing material: {material}")
+                missing_materials.append(material_name)
+            else:
+                stock_entries_to_remove.append(stock_entry)  
 
-            # Check if the material is registered in Special_Material for this fusion
-            special_material_entry = Special_Material.query.filter_by(
-                wildcard_id=player.wildcard.id,
-                special_fusion_id=material_persona.id,  # Fix here: should match with fusion material
-                material_id=material_persona.id
-            ).first()
-
-            if not special_material_entry:
-                missing_materials.append(material)
-
+        # If the player is missing any materials, return an error
         if missing_materials:
-            
             return {'error': f'Missing required materials: {", ".join(missing_materials)}'}, 400
-        
-        # Perform the fusion - Create the special fusion persona
-        fusion_persona = Persona.query.filter_by(name=fusion_requests["fusion"]).first()
 
-        if not fusion_persona:
-            return {'error': 'Fusion persona not found in database.'}, 404
-
-        # Add special fusion persona to stock
+        # Perform the fusion - Add the new persona to stock
         new_stock = Stock(player_id=player.id, persona_id=fusion_persona.id)
         db.session.add(new_stock)
 
-        # Add the fusion persona to the compendium if it's not already there
+        # Remove materials from stock
+        for stock_entry in stock_entries_to_remove:
+            db.session.delete(stock_entry)
+
+        # Check if the fusion persona is already in the compendium
         existing_entry = Compendium.query.filter_by(player_id=player.id, persona_id=fusion_persona.id).first()
         if not existing_entry:
             new_compendium_entry = Compendium(player_id=player.id, persona_id=fusion_persona.id, in_stock=True)
             db.session.add(new_compendium_entry)
 
         # Commit changes to the database
-        db.session.commit()
+            db.session.commit()
 
-        return {'message': f'{fusion_requests["fusion"]} successfully fused and added to compendium!', 
-                'player': player.to_dict(only=("id", "username", "level", "yen", "stock_limit", 
+        return {
+            'message': f'{fusion_name} successfully fused! Materials have been removed from stock.',
+            'player': player.to_dict(only=("id", "username", "level", "yen", "stock_limit", 
                                    "wildcard.id", "wildcard.name", "wildcard.image",
-                                   "personas.id", "personas.name", "personas.level", "personas.arcana.name"))}, 201
+                                   "personas.id", "personas.name", "personas.level", "personas.arcana.name" )) }, 201
+               
+           
+       
     
 class SpecialFusions(Resource):
     def get(self):
@@ -697,11 +706,11 @@ class SpecialFusions(Resource):
         if not fusion_dict:
             return {'error': 'No special fusions available for this wildcard.'}, 404
 
-        # Format response
-        special_fusions = [
-            {'name': fusion, 'materials': materials}
-            for fusion, materials in fusion_dict.items()
-        ]
+        # Convert materials to an array of names
+        special_fusions = []
+        for fusion_name, materials_dict in fusion_dict.items():
+            materials = list(materials_dict.keys())  # Extract material names
+            special_fusions.append({'name': fusion_name, 'materials': materials})
 
         return special_fusions, 200
 api.add_resource(ClearSession, '/clear', endpoint='clear')

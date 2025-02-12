@@ -41,8 +41,6 @@ export const AuthProvider = ({ children }) => {
         try {
             const response = await api.post('/login', { username, password });
             setUser(response.data);
-            // Save the user data to localStorage to persist the session
-            localStorage.setItem('user', JSON.stringify(response.data));
             navigate('/');
         } catch (error) {
             console.error("Login failed", error);
@@ -55,8 +53,6 @@ export const AuthProvider = ({ children }) => {
     const logout = () => {
         api.delete('/logout').then(() => {
             setUser(null);
-            // Remove user data from localStorage on logout
-            localStorage.removeItem('user');
             navigate('/login');
         }).catch((error) => {
             console.error("Logout failed", error);
