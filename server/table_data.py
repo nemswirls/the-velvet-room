@@ -25,9 +25,9 @@ arcanas = [
 ]
 
 wildcards = [
-    {"id": 1, "name": "Makoto Yuki", "image": "makoto_yuki_wildcard.png", "initial_persona_id": "Orpheus", "special_fusions": [{"special_fusion_id":198, "material_id":[136,154,155,193,173],},{"special_fusion_id":199, "material_id":[134,135,136,137,138],},{"special_fusion_id":200, "material_id":[1,199],}, ] },
-    {"id": 2, "name": "Yu Narukami", "image": "yu_narukami_wildcard.png", "initial_persona_id": "Izanagi", "special_fusions": [{"special_fusion_id":198, "material_id":[136,154,155,193,173],},{"special_fusion_id":201, "material_id":[175,95,50,52,113],},{"special_fusion_id":202, "material_id":[2,201],}, ] },
-    {"id": 3, "name": "Ren Amamiya", "image": "ren_amamiya_wildcard.png", "initial_persona_id": "Arsène", "special_fusions": [{"special_fusion_id":198, "material_id":[136,154,155,193,173],},{"special_fusion_id":203, "material_id":[5,20,192,151,193],},{"special_fusion_id":204, "material_id":[3,203],}, ] },
+    {"id": 1, "name": "Makoto Yuki", "image": "makoto_yuki_wildcard.png", "initial_persona_id": "Orpheus"},
+    {"id": 2, "name": "Yu Narukami", "image": "yu_narukami_wildcard.png", "initial_persona_id": "Izanagi"},
+    {"id": 3, "name": "Ren Amamiya", "image": "ren_amamiya_wildcard.png", "initial_persona_id": "Arsène" },
 ]
 
 personas = [ 
@@ -237,7 +237,69 @@ personas = [
     {"id": 204, "name": "Raoul", "arcana": "Fool", "level": 91, "image": "persona204.png", "in_pool": False, "special": True},
   ]
 
-        
+specials_dict = {
+        "Makoto Yuki": {
+            "Lucifer": {
+                "Samael": True, 
+                "Abaddon": True,
+                "Beelzebub": True,
+                "Satan": True,
+                "Helel": True,
+            },
+           "Thanatos":{
+                "Pale Rider": True,
+                "Loa": True,
+                "Samael": True,
+                "Mot": True,
+                "Alice": True,
+           },
+           "Messiah":{
+               "Orpheus": True,
+               "Thanatos": True,
+           }
+        },
+          "Yu Narukami": {
+              "Lucifer": {
+                "Samael": True, 
+                "Abaddon": True,
+                "Beelzebub": True,
+                "Satan": True,
+                "Helel": True,
+            },
+            "Magatsu-Izanagi":{
+                 "Yamata-no-Orochi": True,
+                 "Throne": True,
+                 "Naga Raja": True,
+                 "Barong": True,
+                 "Norn": True,
+            },
+            "Izanagi-no-Okami": {
+                "Izanagi": True,
+                "Magatsu-Izanagi": True,
+            }
+          },
+          "Ren Amamiya": {
+              "Lucifer": {
+                "Samael": True, 
+                "Abaddon": True,
+                "Beelzebub": True, 
+                "Satan": True,
+                "Helel": True,
+              },
+              "Satanael":{
+                  "Legion": True, 
+                  "Mercurius": True,
+                  "Michael": True,
+                  "Succubus": True,
+                  "Satan": True,
+                },
+                "Raoul": {
+                    "Arsène": True,
+                    "Satanael": True,
+                }
+              }  
+                  
+    }          
 
 
 
