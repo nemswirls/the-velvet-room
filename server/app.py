@@ -66,7 +66,9 @@ class CheckSession(Resource):
             player = Player.query.filter(Player.id == player_id).first()
             if player:
                 # If player is found, return player data
-                return player.to_dict(only=("username", "wildcard", "personas", "level", "yen", "stock_limit")), 200
+                return player.to_dict(only=("id", "username", "level", "yen", "stock_limit", 
+                                   "wildcard.id", "wildcard.name", "wildcard.image",
+                                   "personas.id", "personas.name", "personas.level", "personas.arcana.name")), 200
         
         # Return an error if player_id is not in session or player doesn't exist
         return {'error': 'Unauthorized, please log in first'}, 401
@@ -83,7 +85,11 @@ class Login(Resource):
                 return {'error': 'Invalid username or password'}, 401
 
             session['player_id'] = player.id  # Store player ID in the session
-            return player.to_dict(only=("username","wildcard","personas","level", "yen", "stock_limit",)), 200
+            return player.to_dict(only=(
+            "id", "username", "level", "yen", "stock_limit", 
+            "wildcard.id", "wildcard.name", "wildcard.image",
+            "personas.id", "personas.name", "personas.level", "personas.arcana.name"
+            )), 200
         except Exception as e:
             return {'error': f'An error occurred: {str(e)}'}, 500
 
@@ -141,7 +147,9 @@ class ChooseWildcard(Resource):
                 print(f"Added new entry to Compendium for Persona ID: {initial_persona.id}")
 
                 db.session.commit()
-            return {'message': 'Wildcard chosen successfully', 'player': player.to_dict(only=("username","wildcard","level","personas"))}, 200
+            return {'message': 'Wildcard chosen successfully', 'player': player.to_dict(only=("id", "username", "level", "yen", "stock_limit", 
+                                   "wildcard.id", "wildcard.name", "wildcard.image",
+                                   "personas.id", "personas.name", "personas.level", "personas.arcana.name"))}, 200
         except Exception as e:
             db.session.rollback()
             return {'error': f'An error occurred: {str(e)}'}, 500
@@ -233,8 +241,11 @@ class SummonPersona(Resource):
             # Update stock limit based on the new level
             player.update_stock_limit()
             db.session.commit()
-            persona_dict = selected_persona.to_dict(only=("name", "level", "arcana.name", "image"))
-            persona_dict["player"] = player.to_dict(only=("username", "level", "personas", "stock_limit", "wildcard", "yen"))
+            persona_dict = selected_persona.to_dict(only=("id","name", "level", "arcana.name", "image"))
+            persona_dict["player"] = player.to_dict(only=("id", "username", "level", "yen", "stock_limit", 
+                                   "wildcard.id", "wildcard.name", "wildcard.image",
+                                   "personas.id", "personas.name", "personas.level", "personas.arcana.name" ))
+                                                        
             return make_response(persona_dict, 201)
 
         except Exception as e:
@@ -333,7 +344,9 @@ class BuyPersonaById(Resource):
             return make_response({
             'message': 'Persona purchased and added to stock successfully',
             'persona': persona.to_dict(only=("name", "arcana.name", "level")),
-            'player': player.to_dict(only=("username", "level", "stock_limit", "wildcard", "yen"))
+            'player': player.to_dict(only=("id", "username", "level", "yen", "stock_limit", 
+                                   "wildcard.id", "wildcard.name", "wildcard.image",
+                                   "personas.id", "personas.name", "personas.level", "personas.arcana.name"))
             }, 201)
 
         except Exception as e:
@@ -372,7 +385,9 @@ class ReleasePersonaById(Resource):
             db.session.delete(stock_entry)
             db.session.commit()
 
-            return make_response(player.to_dict(only=("username", "level", "personas", "stock_limit", "wildcard", "yen")), 201)
+            return make_response(player.to_dict(only=("id", "username", "level", "yen", "stock_limit", 
+                                   "wildcard.id", "wildcard.name", "wildcard.image",
+                                   "personas.id", "personas.name", "personas.level", "personas.arcana.name")), 201)
 
         except Exception as e:
             db.session.rollback()
@@ -467,7 +482,9 @@ class FusePersonasById(Resource):
 
             return make_response({        
             'persona': fused_persona.to_dict(only=("name", "arcana.name", "level")),
-            'player': player.to_dict(only=("username", "level", "stock_limit", "wildcard", "yen"))
+            'player': player.to_dict(only=("id", "username", "level", "yen", "stock_limit", 
+                                   "wildcard.id", "wildcard.name", "wildcard.image",
+                                   "personas.id", "personas.name", "personas.level", "personas.arcana.name"))
             }, 201)
 
         except Exception as e:
