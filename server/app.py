@@ -637,11 +637,12 @@ class SpecialFusion(Resource):
             stock_entry = Stock.query.filter_by(player_id=player.id, persona_id=material_persona.id).first()
             if not stock_entry:
                 missing_materials.append(material)
+                print(f"Missing material: {material}")
 
             # Check if the material is registered in Special_Material for this fusion
             special_material_entry = Special_Material.query.filter_by(
                 wildcard_id=player.wildcard.id,
-                special_fusion_id=fusion_persona.id,
+                special_fusion_id=material_persona.id,  # Fix here: should match with fusion material
                 material_id=material_persona.id
             ).first()
 
@@ -649,6 +650,7 @@ class SpecialFusion(Resource):
                 missing_materials.append(material)
 
         if missing_materials:
+            
             return {'error': f'Missing required materials: {", ".join(missing_materials)}'}, 400
         
         # Perform the fusion - Create the special fusion persona
@@ -675,7 +677,33 @@ class SpecialFusion(Resource):
                                    "wildcard.id", "wildcard.name", "wildcard.image",
                                    "personas.id", "personas.name", "personas.level", "personas.arcana.name"))}, 201
     
+class SpecialFusions(Resource):
+    def get(self):
+        # Check if the player is logged in
+        player_id = session.get('player_id')
+        if not player_id:
+            return {'error': 'Unauthorized, please log in first'}, 401
 
+        # Retrieve the player
+        player = Player.query.get(player_id)
+        if not player:
+            return {'error': 'Player not found'}, 404
+
+        # Get the player's wildcard
+        wildcard_name = player.wildcard.name
+
+        # Retrieve special fusions for this wildcard
+        fusion_dict = specials_dict.get(wildcard_name)
+        if not fusion_dict:
+            return {'error': 'No special fusions available for this wildcard.'}, 404
+
+        # Format response
+        special_fusions = [
+            {'name': fusion, 'materials': materials}
+            for fusion, materials in fusion_dict.items()
+        ]
+
+        return special_fusions, 200
 api.add_resource(ClearSession, '/clear', endpoint='clear')
 api.add_resource(Signup, '/signup', endpoint='signup')
 api.add_resource(CheckSession, '/check_session', endpoint='check_session')
@@ -693,6 +721,7 @@ api.add_resource(UpdatePlayerProfile, '/update-player-profile', endpoint='update
 api.add_resource(Stocks, '/stocks', endpoint='stocks')
 api.add_resource(FusedPersonaPreview, '/preview-fusion/<int:persona_1_id>/<int:persona_2_id>', endpoint='preview_fusion')
 api.add_resource(SpecialFusion, '/special-fusion', endpoint='special_fusion')
+api.add_resource(SpecialFusions, '/special-fusions', endpoint='special_fusions')
 
 
 if __name__ == '__main__':
