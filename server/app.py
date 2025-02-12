@@ -712,7 +712,7 @@ class SpecialFusions(Resource):
             materials = list(materials_dict.keys())  # Extract material names
             special_fusions.append({'name': fusion_name, 'materials': materials})
 
-        return special_fusions, 200
+        return make_response(special_fusions, 200)
 api.add_resource(ClearSession, '/clear', endpoint='clear')
 api.add_resource(Signup, '/signup', endpoint='signup')
 api.add_resource(CheckSession, '/check_session', endpoint='check_session')

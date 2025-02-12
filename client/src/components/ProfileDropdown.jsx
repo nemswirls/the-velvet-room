@@ -59,7 +59,7 @@ const ProfileDropdown = () => {
     <ProfileContainer>
       {/* Use the wildcard image stored in context */}
       <ProfileImage
-        src={`images/wildcards/${user.wildcard.image}`} 
+        src={`/images/wildcards/${user.wildcard.image}`} 
         onClick={toggleDropdown}
       />
       <DropdownMenu $Open={isDropdownOpen}>
