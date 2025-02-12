@@ -47,15 +47,15 @@ with app.app_context():
     db.session.add_all(wildcard_objects)
     db.session.commit()
 
-    print("Creating special_materials...") 
+    # print("Creating special_materials...") 
    
-    for wildcard in specials_dict: 
-        wc = next(wild for wild in wildcard_objects if wild.name == wildcard) 
-        for result in specials_dict[wildcard]:
-            fusion = next(persona for persona in persona_objects if persona.name == result)
-            for material in specials_dict[wildcard][result]:
-                material_persona = next(persona for persona in persona_objects if persona.name == material)
-                db.session.add(Special_Material(wildcard=wc, special_fusion_persona=fusion, material_persona=material_persona))
+    # for wildcard in specials_dict: 
+    #     wc = next(wild for wild in wildcard_objects if wild.name == wildcard) 
+    #     for result in specials_dict[wildcard]:
+    #         fusion = next(persona for persona in persona_objects if persona.name == result)
+    #         for material in specials_dict[wildcard][result]:
+    #             material_persona = next(persona for persona in persona_objects if persona.name == material)
+    #             db.session.add(Special_Material(wildcard=wc, special_fusion_persona=fusion, material_persona=material_persona))
     
-    db.session.commit()
+    # db.session.commit()
     print("Seeding complete!")

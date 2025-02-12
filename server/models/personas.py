@@ -23,7 +23,15 @@ class Persona(db.Model, SerializerMixin):
     special_fusions = db.relationship("Special_Material", foreign_keys="[Special_Material.special_fusion_id]", back_populates="special_fusion_persona")
     materials = db.relationship("Special_Material", foreign_keys="[Special_Material.material_id]", back_populates="material_persona")
      # Serialization rules
-    serialize_rules = ('-arcana.personas', '-wildcard.initial_persona', '-compendiums.persona', '-stocks.persona', "-special_fusions.special_fusion_persona", "-materials.material_persona" )
+    serialize_rules = (
+        "-arcana.personas",  
+        "-wildcard.initial_persona",  
+        "-stocks.persona", 
+        "-compendiums.persona",  
+        "-special_fusions.special_fusion_persona",  
+        "-materials.material_persona",
+        "-materials.special_fusions"
+    )
 
     __table_args__ = (
         CheckConstraint('level >= 1', name='level_greater_than_zero'),

@@ -17,9 +17,13 @@ class Special_Material(db.Model, SerializerMixin):
     wildcard = db.relationship("Wildcard", back_populates="special_materials")
     special_fusion_persona = db.relationship("Persona", foreign_keys=[special_fusion_id], back_populates="special_fusions")
     material_persona = db.relationship("Persona", foreign_keys=[material_id], back_populates="materials")
-
-    serialize_rules = ("-wildcard.special_materials", "-special_fusion_persona.special_fusions", "-material_persona.materials", "-materials.material_persona", "-special_fusions.special_fusion_persona", 
-                       "-special_fusion_persona.materials", "-material_personas.special_fusions", "-special_materials.wildcard" )
+    serialize_rules = (
+        "-wildcard.special_materials",            
+        "-special_fusion_persona.special_fusions",
+        "-material_persona.materials",            
+        "-special_fusion_persona.materials",      
+        "-material_persona.special_fusions"       
+    )
 
     def __repr__(self):
         return (f'<Special_Material id: {self.id} Wildcard ID: {self.wildcard_id} '
